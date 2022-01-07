@@ -5,15 +5,15 @@ import reportWebVitals from './reportWebVitals';
 import {BrowserRouter, Route, Routes} from "react-router-dom";
 import NoFound from "./pages/NoFound";
 
-import {Layout, Menu} from 'antd';
-import {Row, Col} from 'antd';
+import {Col, Layout, Row, Select} from 'antd';
 import logo from './assets/beegroup_logo.png'
+import LoginDrawer from "./parts/LoginDrawer";
 
 const {Header, Content, Footer} = Layout;
 
 // Constants
 const current_year = new Date().getFullYear();
-// #https://medium.com/zestgeek/ant-design-navbar-with-responsive-drawer-a8d718e471e0
+
 ReactDOM.render(
     <React.StrictMode>
         <Layout>
@@ -29,13 +29,16 @@ ReactDOM.render(
                         <img className="logo" src={logo} alt="BeeGroup Logo"/>
                     </Col>
                     <Col span={6}>
+                        <div style={{marginLeft: "65%"}}>
+                            <LoginDrawer/>
+                        </div>
 
                     </Col>
                 </Row>
             </Header>
             <Content className="site-layout" style={{padding: '0 50px', marginTop: 64}}>
                 <div className="site-layout-background"
-                     style={{margin: '16px 0', padding: 24, minHeight: 380, height: "85vh"}}>
+                     style={{margin: '25px 0', padding: 24, minHeight: 380, height: "80vh"}}>
                     <BrowserRouter>
                         <Routes>
                             <Route path="/" element={<App/>}/>

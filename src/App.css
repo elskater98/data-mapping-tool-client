@@ -1,0 +1,12 @@
+/* ANT DESIGN IMPORT */
+@import '~antd/dist/antd.css';
+
+.site-layout .site-layout-background {
+    background: #fff;
+}
+
+.logo {
+    width: 100%;
+    max-width: 169px;
+    height: 60px;
+}

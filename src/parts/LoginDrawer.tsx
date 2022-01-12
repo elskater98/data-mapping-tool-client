@@ -2,14 +2,19 @@ import {Drawer, Form, Button, Col, Row, Input, Select, DatePicker, Space} from '
 import {UserOutlined, LogoutOutlined} from '@ant-design/icons';
 import React, {Fragment, useState} from "react";
 import {useCookies} from 'react-cookie';
+import AuthService from "../services/AuthService";
 
 const {Option} = Select;
 
 
 const LoginDrawer = () => {
-
+    const authService = new AuthService();
     const [visible, setVisible] = useState(false);
     const [isLogged, setIsLogged] = useState();
+
+    authService.getCredentials("patata", "patata").then((data)=>{
+        console.log(data);
+    })
 
     const showDrawer = () => {
         setVisible(true);
@@ -17,6 +22,7 @@ const LoginDrawer = () => {
 
     const onClose = () => {
         setVisible(false);
+        console.log(isLogged)
     };
 
     return (

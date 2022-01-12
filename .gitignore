@@ -253,3 +253,4 @@ dist
 package-lock.json
 
 .idea/
+config.json

@@ -1,17 +1,19 @@
-import * as config from '../../config.json';
 import axios from "axios";
 
-class AuthService {
+import config from "../config.json";
 
+class AuthService {
     constructor() {
     }
 
-    getCredentials(username: string, password: string) {
+    url = config.api_url
+
+    getCredentials(username: any, password: any) {
         const headers = {
             'Content-Type': 'application/json'
         };
-
-        return axios.post("http://localhost:8080/token", {username: username, password: password}, {headers})
+        
+        return axios.post(this.url + "/auth/token", {username: username, password: password}, {headers})
     }
 
 }

@@ -1,7 +1,7 @@
 import {Drawer, Form, Button, Col, Row, Input, Select, DatePicker, Space} from 'antd';
 import {UserOutlined, LogoutOutlined} from '@ant-design/icons';
 import React, {Fragment, useState} from "react";
-import {useCookies} from 'react-cookie';
+import {useCookies, Cookies} from 'react-cookie';
 import AuthService from "../services/AuthService";
 
 const {Option} = Select;
@@ -9,20 +9,36 @@ const {Option} = Select;
 
 const LoginDrawer = () => {
     const authService = new AuthService();
+    const [cookies, setCookie, removeCookie] = useCookies(['access_token', 'refresh_token']);
     const [visible, setVisible] = useState(false);
-    const [isLogged, setIsLogged] = useState();
+    const [isLogged, setIsLogged] = useState(typeof cookies.access_token == 'undefined');
+    const [credentials, setCredentials] = useState({username: "", password: ""})
+    const logOut = () => {
+        removeCookie('access_token');
+        removeCookie('refresh_token');
+        setIsLogged(false);
+    }
 
-    authService.getCredentials("patata", "patata").then((data)=>{
-        console.log(data);
-    })
+    const logIn = () => {
+        authService.getCredentials(credentials.username, credentials.password).then((data) => {
+            setCookie('access_token', data.data['access_token'], {path: '/'});
+            setCookie('refresh_token', data.data['access_token'], {path: '/'});
+            setIsLogged(true);
+        }).catch((err) => {
+            console.log(err);
+        })
+    }
 
     const showDrawer = () => {
-        setVisible(true);
+        if (isLogged) {
+            logOut();
+        } else {
+            setVisible(true);
+        }
     };
 
     const onClose = () => {
         setVisible(false);
-        console.log(isLogged)
     };
 
     return (

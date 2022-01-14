@@ -7,14 +7,12 @@ import {BrowserRouter} from "react-router-dom";
 import {CookiesProvider} from 'react-cookie';
 
 ReactDOM.render(
-    <React.StrictMode>
-        <CookiesProvider>
-            <BrowserRouter>
-                <App/>
-            </BrowserRouter>
-        </CookiesProvider>
-    </React.StrictMode>,
-    document.getElementById('root')
+    <CookiesProvider>
+        <BrowserRouter>
+            <App/>
+        </BrowserRouter>
+    </CookiesProvider>
+    , document.getElementById('root')
 );
 
 // If you want to start measuring performance in your app, pass a function

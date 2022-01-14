@@ -6,6 +6,7 @@ import LoginDrawer from "./parts/LoginDrawer";
 import NoFound from "./pages/NoFound";
 import {Route, Routes} from "react-router-dom";
 import HomaPage from "./pages/HomaPage";
+import {useCookies} from "react-cookie";
 // Components
 const {Header, Content, Footer} = Layout;
 

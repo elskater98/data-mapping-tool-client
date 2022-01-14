@@ -1,4 +1,4 @@
-import {Button, Col, Drawer, Form, Input, Row} from 'antd';
+import {Button, Col, Drawer, Form, Input, Row, message} from 'antd';
 import {LogoutOutlined, UserOutlined} from '@ant-design/icons';
 import React, {Fragment, useState} from "react";
 import {useCookies} from 'react-cookie';
@@ -10,7 +10,6 @@ const LoginDrawer = () => {
     const [cookies, setCookie, removeCookie] = useCookies(['access_token', 'refresh_token']);
     const [visible, setVisible] = useState(false);
     const [isLogged, setIsLogged] = useState(typeof cookies.access_token != 'undefined');
-    const [credentials, setCredentials] = useState({email: "", password: ""});
 
     const [form] = Form.useForm();
 
@@ -20,14 +19,16 @@ const LoginDrawer = () => {
         setIsLogged(false);
     }
 
-    const logIn = () => {
-        authService.getCredentials(credentials.email, credentials.password).then((data) => {
+    const logIn = (values: any) => {
+        authService.getCredentials(values.email, values.password).then((data) => {
             setCookie('access_token', data.data['access_token'], {path: '/'});
             setCookie('refresh_token', data.data['access_token'], {path: '/'});
             setIsLogged(true);
             onClose();
+            message.success("Successful log In.", 0.5)
         }).catch((err) => {
             console.log(err);
+            message.error("Failed log In.", 0.5)
         })
     };
 
@@ -45,8 +46,7 @@ const LoginDrawer = () => {
     };
 
     const onFinish = (values: any) => {
-        setCredentials(values);
-        logIn();
+        logIn(values);
     }
 
 
@@ -59,7 +59,7 @@ const LoginDrawer = () => {
 
             <Drawer
                 title={!isLogged ? "Log In" : "Log Out"}
-                width={720}
+                width={400}
                 onClose={onClose}
                 visible={visible}
                 bodyStyle={{paddingBottom: 80}}>
@@ -70,42 +70,25 @@ const LoginDrawer = () => {
                     form={form}
                     onFinish={onFinish}
                 >
-                    <Row gutter={16}>
-                        <Col span={12}>
-                            <Form.Item
-                                label="Email"
-                                name="email"
-                                rules={[{required: true, type: "email"}]}>
-                                <Input/>
-                            </Form.Item>
-                        </Col>
-                    </Row>
-                    <Row>
-                        <Col span={12}>
-                            <Form.Item
-                                label="Password"
-                                name="password"
-                                rules={[{required: true}]}>
-                                <Input.Password/>
-                            </Form.Item>
+                    <Form.Item
+                        label="Email"
+                        name="email"
+                        rules={[{required: true, type: "email"}]}>
+                        <Input/>
+                    </Form.Item>
 
-                        </Col>
-                    </Row>
+                    <Form.Item
+                        label="Password"
+                        name="password"
+                        rules={[{required: true}]}>
+                        <Input.Password/>
+                    </Form.Item>
+
                     <Row>
-                        <Col span={3}>
+                        <Col span={20}>
                             <Form.Item>
                                 <Button type="primary" htmlType="submit">
                                     Submit
-                                </Button>
-                            </Form.Item>
-                        </Col>
-
-                        <Col span={3}>
-                            <Form.Item>
-                                <Button type="default" onClick={
-                                    onClose
-                                }>
-                                    Close
                                 </Button>
                             </Form.Item>
                         </Col>

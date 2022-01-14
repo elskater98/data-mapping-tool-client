@@ -6,7 +6,8 @@ import LoginDrawer from "./parts/LoginDrawer";
 import NoFound from "./pages/NoFound";
 import {Route, Routes} from "react-router-dom";
 import HomaPage from "./pages/HomaPage";
-import {useCookies} from "react-cookie";
+import IntegrationPage from "./pages/IntegrationPage";
+
 // Components
 const {Header, Content, Footer} = Layout;
 
@@ -41,7 +42,9 @@ function App() {
                 <div className="site-layout-background"
                      style={{margin: '25px 0', padding: 24, minHeight: 380, height: "85vh"}}>
                     <Routes>
-                        <Route path="/" element={<HomaPage/>}/>
+                        <Route path="/" element={<HomaPage/>}>
+                            <Route path="integration" element={<IntegrationPage/>}/>
+                        </Route>
                         <Route path="*" element={<NoFound/>}/>
                     </Routes>
                 </div>

@@ -23,8 +23,8 @@ const HomaPage = () => {
     const [current, setCurrent] = useState(0);
     let navigate = useNavigate();
 
-    const next = () => {
-        switch (current + 1) {
+    const handleNavigation = (index: number) => {
+        switch (index) {
             case 0:
                 navigate("/")
                 break
@@ -32,19 +32,15 @@ const HomaPage = () => {
                 navigate("/integration")
                 break
         }
-        setCurrent(current + 1);
+        setCurrent(index);
+    }
+
+    const next = () => {
+        handleNavigation(current + 1)
     };
 
     const prev = () => {
-        switch (current - 1) {
-            case 0:
-                navigate("/")
-                break
-            case 1:
-                navigate("/integration")
-                break
-        }
-        setCurrent(current - 1);
+        handleNavigation(current - 1)
     };
 
     return (

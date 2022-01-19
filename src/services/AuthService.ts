@@ -17,9 +17,12 @@ class AuthService {
         return axios.post(this.url + "/auth/token", {username: username, password: password}, {headers})
     }
 
+    hasCredentials() {
+        return this.cookies['access_token']
+    }
+
     getUserInfo() {
         const headers = {
-            'Content-Type': 'application/json',
             'Authorization': 'Bearer ' + this.cookies['access_token']
         };
 

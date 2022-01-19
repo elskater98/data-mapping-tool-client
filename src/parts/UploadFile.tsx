@@ -3,10 +3,12 @@ import {message, Upload} from 'antd';
 import {InboxOutlined} from '@ant-design/icons';
 import {useCookies} from "react-cookie";
 import ConfigService from "../services/ConfigService";
+import store from "../store";
+import {handleUploadStep} from "../actions";
 
 const {Dragger} = Upload;
 
-const UploadPage = () => {
+const UploadFile = () => {
     const [cookies, setCookies] = useCookies(['access_token']);
     const configService = new ConfigService().getConfig()
 
@@ -20,6 +22,8 @@ const UploadPage = () => {
         } else if (status === 'error') {
             message.error(`${info.file.name} file upload failed.`, 2);
         }
+
+        store.dispatch(handleUploadStep(info.fileList.length > 0))
     }
 
     return (
@@ -43,4 +47,4 @@ const UploadPage = () => {
 }
 
 
-export default UploadPage;
+export default UploadFile;

@@ -27,9 +27,13 @@ const LoginDrawer = () => {
             setIsLogged(true);
             onClose();
             message.success("Successful log In.", 0.5)
+            setTimeout(() => {
+                window.location.reload();
+            }, 500);
+
         }).catch((err) => {
             console.log(err);
-            message.error("Failed log In.", 0.5)
+            message.error("Failed log In.", 1)
         })
     };
 

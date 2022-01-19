@@ -44,7 +44,7 @@ const MappingPage = () => {
     const prev = () => {
         handleNavigation(current - 1)
     };
-    
+
     const [count, setCount] = React.useState<unknown | null | any>(0);
     return (<Fragment>
         <Steps current={current}>

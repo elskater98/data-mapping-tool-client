@@ -18,13 +18,12 @@ class AuthService {
     }
 
     getUserInfo() {
-
         const headers = {
             'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + this.cookies.get('access_token')
+            'Authorization': 'Bearer ' + this.cookies['access_token']
         };
 
-        return axios.post(this.url + "/auth/protected", {headers})
+        return axios.get(this.url + "/auth/protected", {headers})
     }
 }
 

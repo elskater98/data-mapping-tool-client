@@ -4,9 +4,12 @@ import {Col, Layout, Row} from "antd";
 import logo from "./assets/beegroup_logo.png";
 import LoginDrawer from "./parts/LoginDrawer";
 import NoFound from "./pages/NoFound";
-import {Route, Routes} from "react-router-dom";
+import {Navigate, Route, Routes, useNavigate} from "react-router-dom";
 import HomaPage from "./pages/HomaPage";
-import IntegrationPage from "./pages/IntegrationPage";
+import UploadPage from "./pages/UploadPage";
+import MappingPage from "./pages/MappingPage";
+import ProtectedRoute from "./utils/ProtectedRoute";
+import {Roles} from "./utils/Roles";
 
 // Components
 const {Header, Content, Footer} = Layout;
@@ -18,6 +21,7 @@ const current_year = new Date().getFullYear();
 
 
 function App() {
+    let navigate = useNavigate();
     return (
         <Layout>
             <Header style={{
@@ -29,7 +33,9 @@ function App() {
             }}>
                 <Row>
                     <Col span={18}>
-                        <img className="logo" src={logo} alt="BeeGroup Logo"/>
+                        <img onClick={() => {
+                            navigate('/')
+                        }} className="logo" src={logo} alt="BeeGroup Logo"/>
                     </Col>
                     <Col span={6}>
                         <div style={{marginLeft: "70%"}}>
@@ -42,8 +48,10 @@ function App() {
                 <div className="site-layout-background"
                      style={{margin: '25px 0', padding: 24, minHeight: 380, height: "85vh"}}>
                     <Routes>
-                        <Route path="/" element={<HomaPage/>}>
-                            <Route path="integration" element={<IntegrationPage/>}/>
+                        <Route path="/" element={<HomaPage/>}/>
+                        <Route path="/mapping" element={<ProtectedRoute roles={[Roles.User, Roles.Admin]}><MappingPage/></ProtectedRoute>}>
+                            <Route path="/mapping" element={<Navigate to={"upload/"}/>}/>
+                            <Route path="upload/" element={<UploadPage/>}/>
                         </Route>
                         <Route path="*" element={<NoFound/>}/>
                     </Routes>

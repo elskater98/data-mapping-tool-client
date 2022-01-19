@@ -14,9 +14,10 @@ const LoginDrawer = () => {
     const [form] = Form.useForm();
 
     const logOut = () => {
-        removeCookie('access_token');
-        removeCookie('refresh_token');
+        removeCookie('access_token', {path: '/'});
+        removeCookie('refresh_token', {path: '/'});
         setIsLogged(false);
+        window.location.reload();
     }
 
     const logIn = (values: any) => {

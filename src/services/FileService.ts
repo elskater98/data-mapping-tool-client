@@ -14,7 +14,7 @@ class FileService {
             'Authorization': 'Bearer ' + this.authService.hasCredentials()
         };
 
-        return axios.get(this.configService.getConfig().api_url + '/mapping/data', {
+        return axios.get(this.configService.getConfig().api_url + '/mapping/data/sample', {
             params: {filename: filename},
             headers: headers
         })

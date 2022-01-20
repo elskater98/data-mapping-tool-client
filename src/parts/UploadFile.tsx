@@ -4,7 +4,7 @@ import {InboxOutlined} from '@ant-design/icons';
 import {useCookies} from "react-cookie";
 import ConfigService from "../services/ConfigService";
 import store from "../store";
-import {saveFile, handleUploadStep} from "../actions";
+import {handleUploadStep, saveFile} from "../actions";
 
 const {Dragger} = Upload;
 

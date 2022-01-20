@@ -1,7 +1,8 @@
 const initState = {
     upload: false,
     sample: false,
-    file: null
+    file: null,
+    index: 0
 }
 
 const mappingReducer = (state = initState, action: any) => {
@@ -17,6 +18,9 @@ const mappingReducer = (state = initState, action: any) => {
 
         case "SAVE_FILE":
             return {...state, file: action.payload}
+
+        case "SET_INDEX":
+            return {...state, index: action.payload}
 
         default:
             return state

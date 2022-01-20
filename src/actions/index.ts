@@ -19,6 +19,13 @@ export const saveFile = (payload: any) => {
     }
 }
 
+export const setIndex = (payload: any) => {
+    return {
+        type: "SET_INDEX",
+        payload: payload
+    }
+}
+
 export const initStepper = () => {
     return {
         type: "INIT_STEPPER"

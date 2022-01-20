@@ -6,9 +6,9 @@ const ProtectedRoute = ({children, roles}: { children: JSX.Element, roles: Array
 
     const authService = new AuthService()
     if (authService.hasCredentials()) {
-        authService.getUserInfo().then((res) => {
+        /*authService.getUserInfo().then((res) => {
             //console.log(res.data.claims) // Manage if the user has permissions
-        })
+        })*/
         return children;
     }
 

@@ -11,6 +11,7 @@ const MappingPage = () => {
     const [current, setCurrent] = useState(store.getState().mapping.index);
     const [nextStep, setNextStep] = useState(store.getState().mapping.upload)
     const [prevStep, setPrevStep] = useState(false)
+    const [doneStep, setDoneStep] = useState(false)
     const navigate = useNavigate();
 
     const [steps, setSteps] = useState([
@@ -19,6 +20,12 @@ const MappingPage = () => {
         },
         {
             title: 'Sample Data',
+        },
+        {
+            title: 'Select Columns',
+        },
+        {
+            title: 'Mapping',
         }
     ]);
 
@@ -31,9 +38,20 @@ const MappingPage = () => {
             case 1:
                 navigate("sample/")
                 break
+            case 2:
+                navigate("select/")
+                sendColumnsToMap();
+                break
+            case 3:
+                navigate("process/")
+                break
         }
         setCurrent(index);
         store.dispatch(setIndex(index));
+    }
+
+    const sendColumnsToMap = () => {
+
     }
 
     const next = () => {
@@ -44,6 +62,10 @@ const MappingPage = () => {
         handleNavigation(current - 1)
     };
 
+    const done = () => {
+        message.success('Processing complete!')
+    }
+
     let unsubscribe = store.subscribe(() => {
         switch (store.getState().mapping.index) {
             case 0: // upload
@@ -51,8 +73,18 @@ const MappingPage = () => {
                 break
 
             case 1: // sample
-                setNextStep(true);
+                setNextStep(store.getState().mapping.sample);
                 setPrevStep(true);
+                break
+
+            case 2: // select
+                setNextStep(store.getState().mapping.columnsSelected.length > 0);
+                setPrevStep(true);
+                break
+
+            case 3: // process
+                setPrevStep(true);
+                setDoneStep(true);
                 break
         }
     });
@@ -76,7 +108,7 @@ const MappingPage = () => {
             )}
 
             {current === steps.length - 1 && (
-                <Button type="primary" onClick={() => message.success('Processing complete!')}>
+                <Button type="primary" onClick={done}>
                     Done
                 </Button>
             )}

@@ -20,6 +20,16 @@ class FileService {
         })
     }
 
+    getColumns(filename: string) {
+        const headers = {
+            'Authorization': 'Bearer ' + this.authService.hasCredentials()
+        };
+
+        return axios.get(this.configService.getConfig().api_url + '/mapping/data/sample/columns', {
+            params: {filename: filename},
+            headers: headers
+        })
+    }
 }
 
 export default FileService;

@@ -13,6 +13,8 @@ import {Roles} from "./utils/Roles";
 import {Provider} from "react-redux";
 import store from "./store";
 import SampleData from "./parts/SampleData";
+import SelectData from "./parts/SelectData";
+import MappingData from "./parts/MappingData";
 
 // Components
 const {Header, Content, Footer} = Layout;
@@ -56,6 +58,8 @@ function App() {
                                 <Route path="/mapping" element={<Navigate to={"upload/"}/>}/>
                                 <Route path="upload/" element={<UploadFile/>}/>
                                 <Route path="sample/" element={<SampleData/>}/>
+                                <Route path="select/" element={<SelectData/>}/>
+                                <Route path="process/" element={<MappingData/>}/>
                             </Route>
                             <Route path="*" element={<NoFound/>}/>
                         </Routes>

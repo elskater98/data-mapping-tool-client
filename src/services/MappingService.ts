@@ -31,12 +31,26 @@ class MappingService {
         })
     }
 
-    createMapping(data: any) {
+    createMappingInstance(data: any) {
         const headers = {
             'Authorization': 'Bearer ' + this.authService.hasCredentials()
         };
 
         return axios.post(this.configService.getConfig().api_url + '/mapping/', data, {headers: headers})
+    }
+
+    getMappingInstances() {
+        const headers = {
+            'Authorization': 'Bearer ' + this.authService.hasCredentials()
+        };
+        return axios.get(this.configService.getConfig().api_url + '/mapping/', {headers: headers})
+    }
+
+    getMappingInstance(ref: string) {
+        const headers = {
+            'Authorization': 'Bearer ' + this.authService.hasCredentials()
+        };
+        return axios.get(this.configService.getConfig().api_url + '/mapping/' + ref, {headers: headers})
     }
 }
 

@@ -5,7 +5,7 @@ import MappingService from "../services/MappingService";
 import {setColumns, setSelectedColumns} from "../actions";
 
 const SelectData = () => {
-    const filename = store.getState().mapping.file.name;
+    const filename = store.getState().instance.file.name;
     const fileService = new MappingService();
 
     const [data, setData] = useState([{
@@ -15,7 +15,7 @@ const SelectData = () => {
         chosen: false
     }]);
 
-    const [targetKeys, setTargetKeys] = useState(store.getState().mapping.columnsSelected);
+    const [targetKeys, setTargetKeys] = useState(store.getState().instance.columnsSelected);
 
     useEffect(() => {
         fileService.getColumns(filename).then((res) => {

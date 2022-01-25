@@ -1,6 +1,7 @@
 import React, {Fragment} from 'react';
 import {Roles} from "./Roles";
 import AuthService from "../services/AuthService";
+import UnauthorizedPage from "../pages/UnauthorizedPage";
 
 const ProtectedRoute = ({children, roles}: { children: JSX.Element, roles: Array<Roles> }) => {
 
@@ -12,9 +13,7 @@ const ProtectedRoute = ({children, roles}: { children: JSX.Element, roles: Array
         return children;
     }
 
-    return (<Fragment>
-        <h1>ERROR 401 : Unauthorized</h1>
-    </Fragment>)
+    return (<UnauthorizedPage></UnauthorizedPage>)
 
 
 }

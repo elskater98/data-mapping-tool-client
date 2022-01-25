@@ -8,7 +8,7 @@ const initState = {
     currentMapping: null
 }
 
-const mappingReducer = (state = initState, action: any) => {
+const instanceReducer = (state = initState, action: any) => {
     switch (action.type) {
         case "INIT_STEPPER":
             return initState
@@ -39,4 +39,4 @@ const mappingReducer = (state = initState, action: any) => {
     }
 }
 
-export default mappingReducer;
+export default instanceReducer;

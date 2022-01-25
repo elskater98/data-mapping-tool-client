@@ -7,14 +7,14 @@ import NoFound from "./pages/NoFound";
 import {Navigate, Route, Routes, useNavigate} from "react-router-dom";
 import HomaPage from "./pages/HomaPage";
 import UploadFile from "./parts/UploadFile";
-import MappingPage from "./pages/MappingPage";
+import InstancePage from "./pages/InstancePage";
 import ProtectedRoute from "./utils/ProtectedRoute";
 import {Roles} from "./utils/Roles";
 import {Provider} from "react-redux";
 import store from "./store";
 import SampleData from "./parts/SampleData";
 import SelectData from "./parts/SelectData";
-import MappingData from "./parts/MappingData";
+import MyInstancesPage from "./pages/MyInstancesPage";
 
 // Components
 const {Header, Content, Footer} = Layout;
@@ -53,14 +53,15 @@ function App() {
                          style={{margin: '25px 0', padding: 24, minHeight: 380, height: "85vh"}}>
                         <Routes>
                             <Route path="/" element={<HomaPage/>}/>
-                            <Route path="/mapping" element={<ProtectedRoute
-                                roles={[Roles.User, Roles.Admin]}><MappingPage/></ProtectedRoute>}>
-                                <Route path="/mapping" element={<Navigate to={"upload/"}/>}/>
+                            <Route path="/instance" element={<ProtectedRoute
+                                roles={[Roles.User, Roles.Admin]}><InstancePage/></ProtectedRoute>}>
+                                <Route path="/instance" element={<Navigate to={"upload/"}/>}/>
                                 <Route path="upload/" element={<UploadFile/>}/>
                                 <Route path="sample/" element={<SampleData/>}/>
                                 <Route path="select/" element={<SelectData/>}/>
-                                <Route path="process/" element={<MappingData/>}/>
                             </Route>
+                            <Route path={"/config"} element={<ProtectedRoute
+                                roles={[Roles.User, Roles.Admin]}><MyInstancesPage/></ProtectedRoute>}/>
                             <Route path="*" element={<NoFound/>}/>
                         </Routes>
                     </div>

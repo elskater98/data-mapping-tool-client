@@ -6,7 +6,7 @@ import {handleSampleStep} from "../actions";
 
 const SampleData = () => {
 
-    const filename = store.getState().mapping.file.name
+    const filename = store.getState().instance.file.name
     const fileService = new MappingService();
     const [tableData, setTableData] = useState<any>([]);
     const [columns, setTableColumns] = useState<any>([]);

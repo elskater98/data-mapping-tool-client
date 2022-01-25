@@ -7,10 +7,10 @@ import MappingService from "../services/MappingService";
 
 const {Step} = Steps;
 
-const MappingPage = () => {
+const InstancePage = () => {
 
-    const [current, setCurrent] = useState(store.getState().mapping.index);
-    const [nextStep, setNextStep] = useState(store.getState().mapping.upload)
+    const [current, setCurrent] = useState(store.getState().instance.index);
+    const [nextStep, setNextStep] = useState(store.getState().instance.upload)
     const [prevStep, setPrevStep] = useState(false)
     const [doneStep, setDoneStep] = useState(false)
     const navigate = useNavigate();
@@ -25,12 +25,8 @@ const MappingPage = () => {
         },
         {
             title: 'Select Columns',
-        },
-        {
-            title: 'Mapping',
         }
     ]);
-
 
     const handleNavigation = (index: number) => {
         switch (index) {
@@ -43,20 +39,14 @@ const MappingPage = () => {
             case 2:
                 navigate("select/")
                 break
-            case 3:
-                navigate("process/")
-                if (store.getState().mapping.columnsSelected.length > 0) {
-                    sendColumnsToMap();
-                }
-                break
         }
         setCurrent(index);
         store.dispatch(setIndex(index));
     }
 
     const sendColumnsToMap = () => {
-        const data = store.getState().mapping;
-        mappingService.createMapping({
+        const data = store.getState().instance;
+        mappingService.createMappingInstance({
             rawColumns: data.columns,
             selectedColumns: data.columnsSelected,
             filename: data.file.name
@@ -78,28 +68,26 @@ const MappingPage = () => {
     };
 
     const done = () => {
-        message.success('Processing complete!')
+        if (store.getState().instance.columnsSelected.length > 0) {
+            sendColumnsToMap();
+            navigate('/')
+        }
     }
 
     let unsubscribe = store.subscribe(() => {
-        switch (store.getState().mapping.index) {
+        switch (store.getState().instance.index) {
             case 0: // upload
-                setNextStep(store.getState().mapping.file);
+                setNextStep(store.getState().instance.file);
                 break
 
             case 1: // sample
-                setNextStep(store.getState().mapping.sample);
+                setNextStep(store.getState().instance.sample);
                 setPrevStep(true);
                 break
 
             case 2: // select
-                setNextStep(store.getState().mapping.columnsSelected.length > 0);
+                setDoneStep(store.getState().instance.columnsSelected.length > 0);
                 setPrevStep(true);
-                break
-
-            case 3: // process
-                setPrevStep(false);
-                setDoneStep(true);
                 break
         }
     });
@@ -136,4 +124,4 @@ const MappingPage = () => {
     </Fragment>);
 
 }
-export default MappingPage
+export default InstancePage;

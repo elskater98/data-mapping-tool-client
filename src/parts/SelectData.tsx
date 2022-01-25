@@ -1,12 +1,12 @@
 import {Fragment, useEffect, useState} from "react";
 import {message, Transfer} from "antd";
 import store from "../store";
-import FileService from "../services/FileService";
-import {setSelectedColumns} from "../actions";
+import MappingService from "../services/MappingService";
+import {setColumns, setSelectedColumns} from "../actions";
 
 const SelectData = () => {
     const filename = store.getState().mapping.file.name;
-    const fileService = new FileService();
+    const fileService = new MappingService();
 
     const [data, setData] = useState([{
         key: "init".toString(),
@@ -28,6 +28,7 @@ const SelectData = () => {
                 };
             })
             setData(cols);
+            store.dispatch(setColumns(res.data['columns']));
             message.success("The columns has been generated successfully.", 1);
         }).catch((err) => {
             message.error(err, 3)

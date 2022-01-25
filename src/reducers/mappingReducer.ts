@@ -3,7 +3,9 @@ const initState = {
     sample: false,
     file: null,
     index: 0,
-    columnsSelected: []
+    columnsSelected: [],
+    columns: [],
+    currentMapping: null
 }
 
 const mappingReducer = (state = initState, action: any) => {
@@ -23,8 +25,14 @@ const mappingReducer = (state = initState, action: any) => {
         case "SET_INDEX":
             return {...state, index: action.payload}
 
-        case "SET_COLUMNS":
+        case "SET_SELECTED_COLUMNS":
             return {...state, columnsSelected: action.payload}
+
+        case "SET_COLUMNS":
+            return {...state, columns: action.payload}
+
+        case "SET_CURRENT_MAPPING":
+            return {...state, currentMapping: action.payload}
 
         default:
             return state

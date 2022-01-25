@@ -1,13 +1,13 @@
 import {Fragment, useEffect, useState} from "react";
 import store from "../store";
-import FileService from "../services/FileService";
+import MappingService from "../services/MappingService";
 import {message, Table} from "antd";
 import {handleSampleStep} from "../actions";
 
 const SampleData = () => {
 
     const filename = store.getState().mapping.file.name
-    const fileService = new FileService();
+    const fileService = new MappingService();
     const [tableData, setTableData] = useState<any>([]);
     const [columns, setTableColumns] = useState<any>([]);
 

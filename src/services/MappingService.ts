@@ -2,7 +2,7 @@ import axios from "axios";
 import AuthService from "./AuthService";
 import ConfigService from "./ConfigService";
 
-class FileService {
+class MappingService {
     private authService = new AuthService();
     private configService = new ConfigService();
 
@@ -30,6 +30,14 @@ class FileService {
             headers: headers
         })
     }
+
+    createMapping(data: any) {
+        const headers = {
+            'Authorization': 'Bearer ' + this.authService.hasCredentials()
+        };
+
+        return axios.post(this.configService.getConfig().api_url + '/mapping/', data, {headers: headers})
+    }
 }
 
-export default FileService;
+export default MappingService;

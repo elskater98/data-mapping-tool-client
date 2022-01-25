@@ -21,12 +21,12 @@ class AuthService {
         return this.cookies['access_token']
     }
 
-    getUserInfo() {
+    getProfile(username: string) {
         const headers = {
             'Authorization': 'Bearer ' + this.cookies['access_token']
         };
 
-        return axios.get(this.url + "/auth/protected", {headers})
+        return axios.get(this.url + "/users/" + username, {headers})
     }
 }
 

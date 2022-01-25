@@ -2,7 +2,8 @@ import React, {Fragment, useState} from "react";
 import {Button, message, Steps} from "antd";
 import {Outlet, useNavigate} from "react-router-dom";
 import store from "../store";
-import {setIndex} from "../actions";
+import {setCurrentMapping, setIndex} from "../actions";
+import MappingService from "../services/MappingService";
 
 const {Step} = Steps;
 
@@ -13,6 +14,7 @@ const MappingPage = () => {
     const [prevStep, setPrevStep] = useState(false)
     const [doneStep, setDoneStep] = useState(false)
     const navigate = useNavigate();
+    const mappingService = new MappingService();
 
     const [steps, setSteps] = useState([
         {
@@ -40,10 +42,12 @@ const MappingPage = () => {
                 break
             case 2:
                 navigate("select/")
-                sendColumnsToMap();
                 break
             case 3:
                 navigate("process/")
+                if (store.getState().mapping.columnsSelected.length > 0) {
+                    sendColumnsToMap();
+                }
                 break
         }
         setCurrent(index);
@@ -51,7 +55,18 @@ const MappingPage = () => {
     }
 
     const sendColumnsToMap = () => {
-
+        const data = store.getState().mapping;
+        mappingService.createMapping({
+            rawColumns: data.columns,
+            selectedColumns: data.columnsSelected,
+            filename: data.file.name
+        }).then((res) => {
+            const ref = res.data['data']['ref']
+            store.dispatch(setCurrentMapping(ref))
+            message.info("New Mapping with ref.:" + ref)
+        }).catch((err) => {
+            message.error("The mapping has been failed during the creation.")
+        });
     }
 
     const next = () => {
@@ -83,7 +98,7 @@ const MappingPage = () => {
                 break
 
             case 3: // process
-                setPrevStep(true);
+                setPrevStep(false);
                 setDoneStep(true);
                 break
         }
@@ -108,7 +123,7 @@ const MappingPage = () => {
             )}
 
             {current === steps.length - 1 && (
-                <Button type="primary" onClick={done}>
+                <Button type="primary" disabled={!doneStep} onClick={done}>
                     Done
                 </Button>
             )}

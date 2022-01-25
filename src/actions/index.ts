@@ -34,9 +34,24 @@ export const initStepper = () => {
 
 export const setSelectedColumns = (payload: any) => {
     return {
+        type: "SET_SELECTED_COLUMNS",
+        payload: payload
+    }
+}
+
+export const setColumns = (payload: any) => {
+    return {
         type: "SET_COLUMNS",
         payload: payload
     }
+}
+
+export const setCurrentMapping = (payload: number) => {
+    return {
+        type: "SET_CURRENT_MAPPING",
+        payload: payload
+    }
+
 }
 
 

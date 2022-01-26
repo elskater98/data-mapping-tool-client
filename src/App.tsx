@@ -14,7 +14,9 @@ import {Provider} from "react-redux";
 import store from "./store";
 import SampleData from "./parts/SampleData";
 import SelectData from "./parts/SelectData";
-import MyInstancesPage from "./pages/MyInstancesPage";
+import ListInstances from "./parts/ListInstances";
+import CreateMapping from "./parts/CreateMapping";
+import MappingPage from "./pages/MappingPage";
 
 // Components
 const {Header, Content, Footer} = Layout;
@@ -60,8 +62,12 @@ function App() {
                                 <Route path="sample/" element={<SampleData/>}/>
                                 <Route path="select/" element={<SelectData/>}/>
                             </Route>
-                            <Route path={"/config"} element={<ProtectedRoute
-                                roles={[Roles.User, Roles.Admin]}><MyInstancesPage/></ProtectedRoute>}/>
+                            <Route path={"/mapping"} element={<ProtectedRoute
+                                roles={[Roles.User, Roles.Admin]}><MappingPage/></ProtectedRoute>}>
+                                <Route path="" element={<ListInstances/>}/>
+                                <Route path="create/:id" element={<CreateMapping/>}/>
+                            </Route>
+
                             <Route path="*" element={<NoFound/>}/>
                         </Routes>
                     </div>

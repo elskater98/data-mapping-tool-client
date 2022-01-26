@@ -13,7 +13,7 @@ const ProtectedRoute = ({children, roles}: { children: JSX.Element, roles: Array
         return children;
     }
 
-    return (<UnauthorizedPage></UnauthorizedPage>)
+    return (<UnauthorizedPage/>)
 
 
 }

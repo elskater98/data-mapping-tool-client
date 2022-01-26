@@ -15,7 +15,7 @@ const HomaPage = (props: any) => {
     }
 
     const initMyConfig = () => {
-        navigate('/config');
+        navigate('/mapping');
     }
 
     return (
@@ -26,7 +26,8 @@ const HomaPage = (props: any) => {
             </Row>
             <Row style={{marginTop: "2%"}}>
                 <Button shape="round" icon={<BlockOutlined/>} block={true} type={"primary"} onClick={initMyConfig}>My
-                    Configs</Button>
+                    Mapping
+                    Configurations</Button>
             </Row>
 
         </Fragment>

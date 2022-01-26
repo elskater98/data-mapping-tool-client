@@ -46,11 +46,18 @@ class MappingService {
         return axios.get(this.configService.getConfig().api_url + '/mapping/', {headers: headers})
     }
 
-    getMappingInstance(ref: string) {
+    getMappingInstance(ref: any) {
         const headers = {
             'Authorization': 'Bearer ' + this.authService.hasCredentials()
         };
         return axios.get(this.configService.getConfig().api_url + '/mapping/' + ref, {headers: headers})
+    }
+
+    deleteMappingInstance(ref: string) {
+        const headers = {
+            'Authorization': 'Bearer ' + this.authService.hasCredentials()
+        };
+        return axios.delete(this.configService.getConfig().api_url + '/mapping/' + ref, {headers: headers})
     }
 }
 

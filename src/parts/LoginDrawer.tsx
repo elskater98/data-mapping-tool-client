@@ -22,8 +22,8 @@ const LoginDrawer = () => {
 
     const logIn = (values: any) => {
         authService.getCredentials(values.email, values.password).then((data) => {
-            setCookie('access_token', data.data['access_token'], {path: '/'});
-            setCookie('refresh_token', data.data['access_token'], {path: '/'});
+            setCookie('access_token', data.data['access_token'], {path: '/', maxAge: 259200});
+            setCookie('refresh_token', data.data['access_token'], {path: '/', maxAge: 259200});
             setIsLogged(true);
             onClose();
             message.success("Successful log In.", 0.5)

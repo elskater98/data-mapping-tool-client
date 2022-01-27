@@ -1,10 +1,10 @@
 import {Fragment} from "react";
 import {Outlet} from "react-router-dom";
 
-const MappingPage = () => {
+const MappingInstancesPage = () => {
     return (<Fragment>
         <Outlet/>
     </Fragment>);
 
 }
-export default MappingPage;
+export default MappingInstancesPage;

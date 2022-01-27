@@ -16,7 +16,7 @@ import SampleData from "./parts/SampleData";
 import SelectData from "./parts/SelectData";
 import ListInstances from "./parts/ListInstances";
 import CreateMapping from "./parts/CreateMapping";
-import MappingPage from "./pages/MappingPage";
+import MappingInstancesPage from "./pages/MappingInstancesPage";
 
 // Components
 const {Header, Content, Footer} = Layout;
@@ -63,7 +63,7 @@ function App() {
                                 <Route path="select/" element={<SelectData/>}/>
                             </Route>
                             <Route path={"/mapping"} element={<ProtectedRoute
-                                roles={[Roles.User, Roles.Admin]}><MappingPage/></ProtectedRoute>}>
+                                roles={[Roles.User, Roles.Admin]}><MappingInstancesPage/></ProtectedRoute>}>
                                 <Route path="" element={<ListInstances/>}/>
                                 <Route path="create/:id" element={<CreateMapping/>}/>
                             </Route>

@@ -15,8 +15,10 @@ import store from "./store";
 import SampleData from "./parts/SampleData";
 import SelectData from "./parts/SelectData";
 import ListInstances from "./parts/ListInstances";
-import CreateMapping from "./parts/CreateMapping";
+import MappingDataProperties from "./parts/MappingDataProperties";
 import MappingInstancesPage from "./pages/MappingInstancesPage";
+import MappingData from "./pages/MappingData";
+import MappingClasses from "./parts/MappingClasses";
 
 // Components
 const {Header, Content, Footer} = Layout;
@@ -57,7 +59,7 @@ function App() {
                             <Route path="/" element={<HomaPage/>}/>
                             <Route path="/instance" element={<ProtectedRoute
                                 roles={[Roles.User, Roles.Admin]}><InstancePage/></ProtectedRoute>}>
-                                <Route path="/instance" element={<Navigate to={"upload/"}/>}/>
+                                <Route path="" element={<Navigate to={"upload/"}/>}/>
                                 <Route path="upload/" element={<UploadFile/>}/>
                                 <Route path="sample/" element={<SampleData/>}/>
                                 <Route path="select/" element={<SelectData/>}/>
@@ -65,7 +67,11 @@ function App() {
                             <Route path={"/mapping"} element={<ProtectedRoute
                                 roles={[Roles.User, Roles.Admin]}><MappingInstancesPage/></ProtectedRoute>}>
                                 <Route path="" element={<ListInstances/>}/>
-                                <Route path="create/:id" element={<CreateMapping/>}/>
+                                <Route path=":id/" element={<MappingData/>}>
+                                    <Route path="" element={<Navigate to={"classes/"}/>}/>
+                                    <Route path="classes/" element={<MappingClasses/>}/>
+                                    <Route path="properties/data/" element={<MappingDataProperties/>}/>
+                                </Route>
                             </Route>
 
                             <Route path="*" element={<NoFound/>}/>

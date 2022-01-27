@@ -2,7 +2,7 @@ import {Fragment, useEffect, useState} from "react";
 import {message, Transfer} from "antd";
 import store from "../store";
 import MappingService from "../services/MappingService";
-import {setColumns, setSelectedColumns} from "../actions";
+import {setColumns, setSelectedColumns} from "../actions/instances_actions";
 
 const SelectData = () => {
     const filename = store.getState().instance.file.name;

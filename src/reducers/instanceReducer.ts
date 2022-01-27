@@ -7,31 +7,32 @@ const initState = {
     columns: [],
     currentMapping: null
 }
+const tag = "@instance/"
 
 const instanceReducer = (state = initState, action: any) => {
     switch (action.type) {
-        case "INIT_STEPPER":
+        case tag + "INIT_STEPPER":
             return initState
 
-        case "CHANGE_UPLOAD_STEP":
+        case tag + "CHANGE_UPLOAD_STEP":
             return {...state, upload: action.payload}
 
-        case "CHANGE_SAMPLE_STEP":
+        case tag + "CHANGE_SAMPLE_STEP":
             return {...state, sample: action.payload}
 
-        case "SAVE_FILE":
+        case tag + "SAVE_FILE":
             return {...state, file: action.payload}
 
-        case "SET_INDEX":
+        case tag + "SET_INDEX":
             return {...state, index: action.payload}
 
-        case "SET_SELECTED_COLUMNS":
+        case tag + "SET_SELECTED_COLUMNS":
             return {...state, columnsSelected: action.payload}
 
-        case "SET_COLUMNS":
+        case tag + "SET_COLUMNS":
             return {...state, columns: action.payload}
 
-        case "SET_CURRENT_MAPPING":
+        case tag + "SET_CURRENT_MAPPING":
             return {...state, currentMapping: action.payload}
 
         default:

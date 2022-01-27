@@ -19,7 +19,7 @@ const MyInstancesPage = () => {
     const mappingService = new MappingService();
     const navigate = useNavigate();
     const create = (ref: string) => {
-        navigate("/mapping/create/" + ref)
+        navigate("/mapping/" + ref)
     }
     const [searchInput, setSearchInput] = useState("");
 

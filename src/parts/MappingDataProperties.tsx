@@ -5,7 +5,7 @@ import {message, Select, Table} from "antd";
 import OntologyService from "../services/OntologyService";
 
 const {Column} = Table;
-const CreateMapping = () => {
+const MappingDataProperties = () => {
     const params = useParams();
 
     const mappingService = new MappingService();
@@ -74,4 +74,4 @@ const CreateMapping = () => {
         </Fragment>
     );
 }
-export default CreateMapping;
+export default MappingDataProperties;

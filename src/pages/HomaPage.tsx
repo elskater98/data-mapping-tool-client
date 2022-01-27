@@ -3,7 +3,7 @@ import {useNavigate} from "react-router-dom";
 import {Button, Row} from "antd";
 import {PlusOutlined, BlockOutlined} from '@ant-design/icons';
 import store from "../store";
-import {initStepper} from "../actions";
+import {initStepper} from "../actions/instances_actions";
 
 const HomaPage = (props: any) => {
     let navigate = useNavigate();

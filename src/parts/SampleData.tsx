@@ -2,7 +2,7 @@ import {Fragment, useEffect, useState} from "react";
 import store from "../store";
 import MappingService from "../services/MappingService";
 import {message, Table} from "antd";
-import {handleSampleStep} from "../actions";
+import {handleSampleStep} from "../actions/instances_actions";
 
 const SampleData = () => {
 
@@ -22,8 +22,8 @@ const SampleData = () => {
         })
 
         fileService.getColumns(filename).then((res) => {
-            let cols = res.data['columns'].map((i: string) => {
-                return {title: i, dataIndex: i, key: i}
+            let cols = res.data['columns'].map((i: string, index: number) => {
+                return {title: i, dataIndex: i, key: index}
             });
             setTableColumns(cols);
         }).catch((err) => {

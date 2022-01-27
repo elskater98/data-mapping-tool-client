@@ -2,7 +2,7 @@ import React, {Fragment, useState} from "react";
 import {Button, message, Steps} from "antd";
 import {Outlet, useNavigate} from "react-router-dom";
 import store from "../store";
-import {setCurrentMapping, setIndex} from "../actions";
+import {setCurrentMapping, setIndex} from "../actions/instances_actions";
 import MappingService from "../services/MappingService";
 
 const {Step} = Steps;

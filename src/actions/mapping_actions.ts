@@ -17,3 +17,10 @@ export const init = () => {
         type: tag + "INIT_STEPPER"
     }
 }
+
+export const setProperties = (payload: any) => {
+    return {
+        type: tag + "SET_PROPERTIES",
+        payload: payload
+    }
+}

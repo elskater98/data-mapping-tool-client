@@ -9,7 +9,7 @@ class OntologyService {
     constructor() {
     }
 
-    getProperties(key: string) {
+    getProperties(key: string, args?: object) {
         /*
         * all: Get all available properties (object,data,annotation).
         * object: Get object properties.
@@ -20,7 +20,10 @@ class OntologyService {
             'Authorization': 'Bearer ' + this.authService.hasCredentials()
         };
 
-        return axios.get(this.configService.getConfig().api_url + '/ontology/properties/' + key, {headers: headers});
+        return axios.get(this.configService.getConfig().api_url + '/ontology/properties/' + key, {
+            headers: headers,
+            params: args
+        });
     }
 
     getClasses() {

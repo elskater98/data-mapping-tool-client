@@ -49,11 +49,11 @@ const MappingData = () => {
 
     let unsubscribe = store.subscribe(() => {
         switch (store.getState().mapping.index) {
-            case 0: // upload
+            case 0: // classes
                 setNextStep(store.getState().mapping.classesSelected.length > 0);
                 break
-            case 1: // sample
-                setNextStep(true);
+            case 1: // properties
+                setDoneStep(store.getState().mapping.properties)
                 setPrevStep(true);
                 break
         }

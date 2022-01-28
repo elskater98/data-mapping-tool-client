@@ -5,6 +5,7 @@ const initState = {
     dataProperties: false,
     objectProperties: false,
     classesSelected: [],
+    properties: [],
     index: 0
 }
 
@@ -15,6 +16,9 @@ const mappingReducer = (state = initState, action: any) => {
 
         case tag + "SET_SELECTED_CLASSES":
             return {...state, classesSelected: action.payload}
+
+        case tag + "SET_PROPERTIES":
+            return {...state, properties: action.payload}
 
         case tag + "INIT_STEPPER":
             return initState;

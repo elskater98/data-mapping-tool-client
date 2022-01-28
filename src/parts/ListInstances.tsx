@@ -10,6 +10,8 @@ import {
 } from '@ant-design/icons';
 import {useNavigate} from "react-router-dom";
 import {alphabeticalSort} from "../utils/sorter";
+import store from "../store";
+import {init} from "../actions/mapping_actions";
 
 const {Column} = Table;
 
@@ -19,6 +21,7 @@ const MyInstancesPage = () => {
     const mappingService = new MappingService();
     const navigate = useNavigate();
     const create = (ref: string) => {
+        store.dispatch(init());
         navigate("/mapping/" + ref)
     }
     const [searchInput, setSearchInput] = useState("");

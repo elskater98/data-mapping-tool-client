@@ -5,3 +5,15 @@ export const setIndex = (payload: number) => {
         payload: payload
     }
 }
+export const setSelectedClasses = (payload: any) => {
+    return {
+        type: tag + "SET_SELECTED_CLASSES",
+        payload: payload
+    }
+}
+
+export const init = () => {
+    return {
+        type: tag + "INIT_STEPPER"
+    }
+}

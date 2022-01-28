@@ -7,9 +7,9 @@ import {setIndex} from "../actions/mapping_actions";
 const {Step} = Steps;
 const MappingData = () => {
     const [current, setCurrent] = useState(store.getState().mapping.index);
-    const [nextStep, setNextStep] = useState(true)
-    const [prevStep, setPrevStep] = useState(true)
-    const [doneStep, setDoneStep] = useState(true)
+    const [nextStep, setNextStep] = useState(false)
+    const [prevStep, setPrevStep] = useState(false)
+    const [doneStep, setDoneStep] = useState(false)
     const navigate = useNavigate();
 
     const [steps, setSteps] = useState([
@@ -32,7 +32,6 @@ const MappingData = () => {
         }
         setCurrent(index);
         store.dispatch(setIndex(index));
-        console.log(store.getState())
     }
 
 
@@ -51,16 +50,10 @@ const MappingData = () => {
     let unsubscribe = store.subscribe(() => {
         switch (store.getState().mapping.index) {
             case 0: // upload
-                setNextStep(true);
+                setNextStep(store.getState().mapping.classesSelected.length > 0);
                 break
-
             case 1: // sample
                 setNextStep(true);
-                setPrevStep(true);
-                break
-
-            case 2: // select
-                setDoneStep(true);
                 setPrevStep(true);
                 break
         }

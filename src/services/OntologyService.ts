@@ -23,6 +23,13 @@ class OntologyService {
         return axios.get(this.configService.getConfig().api_url + '/ontology/properties/' + key, {headers: headers});
     }
 
+    getClasses() {
+        const headers = {
+            'Authorization': 'Bearer ' + this.authService.hasCredentials()
+        };
+        return axios.get(this.configService.getConfig().api_url + '/ontology/classes', {headers: headers})
+    }
+
 }
 
 export default OntologyService;

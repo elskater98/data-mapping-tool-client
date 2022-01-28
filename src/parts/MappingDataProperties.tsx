@@ -22,7 +22,7 @@ const MappingDataProperties = () => {
         mappingService.getMappingInstance(params['id']).then((res) => {
             store.dispatch(setProperties(
                 res.data['mappings']['selectedColumns'].map((item: any, index: any) => {
-                    return {key: index, columnName: item, ontology_properties: []}
+                    return {key: index, columnName: item, ontology: []}
                 })
             ));
             setLoading(false);

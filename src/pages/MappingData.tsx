@@ -1,8 +1,9 @@
 import React, {Fragment, useState} from "react";
-import {Outlet, useNavigate} from "react-router-dom";
+import {Outlet, useNavigate, useParams} from "react-router-dom";
 import store from "../store";
-import {Button, Steps} from "antd";
+import {Button, message, Steps} from "antd";
 import {setIndex} from "../actions/mapping_actions";
+import MappingService from "../services/MappingService";
 
 const {Step} = Steps;
 const MappingData = () => {
@@ -12,6 +13,9 @@ const MappingData = () => {
     const [doneStep, setDoneStep] = useState(false)
     const navigate = useNavigate();
 
+    const mappingService = new MappingService();
+    const params = useParams();
+    console.log(params)
     const [steps, setSteps] = useState([
         {
             title: 'Map Classes',
@@ -44,7 +48,20 @@ const MappingData = () => {
     };
 
     const done = () => {
+        mappingService.editMappingInstance(params['id'], {"finished": true}).then((res) => {
+            navigate("/mapping")
+        }).catch((err) => {
+            message.error(err.toString())
+        })
+    }
 
+    const validateMapping = () => {
+        for (let item of store.getState().mapping.properties) {
+            if (item.ontology.length == 0) {
+                return false;
+            }
+        }
+        return true
     }
 
     let unsubscribe = store.subscribe(() => {
@@ -53,7 +70,7 @@ const MappingData = () => {
                 setNextStep(store.getState().mapping.classesSelected.length > 0);
                 break
             case 1: // properties
-                setDoneStep(store.getState().mapping.properties)
+                setDoneStep(validateMapping())
                 setPrevStep(true);
                 break
         }

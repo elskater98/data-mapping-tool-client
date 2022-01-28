@@ -59,6 +59,13 @@ class MappingService {
         };
         return axios.delete(this.configService.getConfig().api_url + '/mapping/' + ref, {headers: headers})
     }
+
+    editMappingInstance(ref: any, data: object) {
+        const headers = {
+            'Authorization': 'Bearer ' + this.authService.hasCredentials()
+        };
+        return axios.patch(this.configService.getConfig().api_url + '/mapping/' + ref, data, {headers: headers})
+    }
 }
 
 export default MappingService;

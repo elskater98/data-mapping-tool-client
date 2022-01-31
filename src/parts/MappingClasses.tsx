@@ -1,17 +1,35 @@
 import {Fragment, useEffect, useState} from "react";
 import OntologyService from "../services/OntologyService";
-import {Form, message, Select} from "antd";
+import {Card, Form, message, Select, Tag} from "antd";
 import store from "../store";
 import {InfoCircleOutlined} from '@ant-design/icons';
-import {setSelectedClasses} from "../actions/mapping_actions";
+import {setProperties, setSelectedClasses} from "../actions/mapping_actions";
+import MappingService from "../services/MappingService";
+import {useParams} from "react-router-dom";
 
 const MappingClasses = () => {
     const ontologyService = new OntologyService();
+    const mappingService = new MappingService();
+    const params = useParams();
     const [classes, setClasses] = useState<any>([]);
     const [loading, setLoading] = useState(false);
 
-    useEffect(() => {
+    const getMappingData = () => {
         setLoading(true);
+        mappingService.getMappingInstance(params['id']).then((res) => {
+            store.dispatch(setProperties(
+                res.data['mappings']['selectedColumns'].map((item: any, index: any) => {
+                    return {key: index, columnName: item, ontology: []}
+                })
+            ));
+            setLoading(false);
+        }).catch((err) => {
+            message.error(err.toString())
+            setLoading(false)
+        });
+    }
+
+    const getOntologyClasses = () => {
         ontologyService.getClasses().then((res) => {
             setClasses(res.data['data']);
             setLoading(false);
@@ -19,6 +37,13 @@ const MappingClasses = () => {
             message.error(err.toString())
             setLoading(false);
         })
+    }
+
+    useEffect(() => {
+        setLoading(true);
+        if (store.getState().mapping.properties.length === 0)
+            getMappingData();
+        getOntologyClasses();
     }, [])
 
     const onChange = (value: string) => {
@@ -26,9 +51,15 @@ const MappingClasses = () => {
     }
 
     return (<Fragment>
-        <Form layout="vertical">
+        <Form layout="vertical" style={{width: "80%", marginLeft: "10%"}}>
+            <Form.Item>
+                <Card loading={loading} style={{overflow: "auto", height: "5%"}}>
+                    {store.getState().mapping.properties.map((item: any) => {
+                        return (<Tag color={"blue"}>{item.columnName}</Tag>)
+                    })}
+                </Card>
+            </Form.Item>
             <Form.Item label="Ontology Classes:" name="select_classes" rules={[{required: true}]}
-                       style={{width: "80%", marginLeft: "10%"}}
                        tooltip={{title: 'Select the classes that will use.', icon: <InfoCircleOutlined/>}}>
                 <Select loading={loading}
                         defaultValue={store.getState().mapping.classesSelected}

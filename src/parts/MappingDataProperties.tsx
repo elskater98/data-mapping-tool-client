@@ -1,36 +1,16 @@
 import {Fragment, useEffect, useState} from "react";
-import {useParams} from "react-router-dom";
-import MappingService from "../services/MappingService";
-import {Form, message, Select, Table} from "antd";
+import {message, Select, Table} from "antd";
 import OntologyService from "../services/OntologyService";
 import store from "../store";
 import {setProperties} from "../actions/mapping_actions";
 
 const {Column} = Table;
 const MappingDataProperties = () => {
-    const params = useParams();
-
-    const mappingService = new MappingService();
     const ontologyService = new OntologyService();
 
     const [loading, setLoading] = useState(false);
     const [options, setOptions] = useState<any>([]);
 
-
-    const getMappingData = () => {
-        setLoading(true);
-        mappingService.getMappingInstance(params['id']).then((res) => {
-            store.dispatch(setProperties(
-                res.data['mappings']['selectedColumns'].map((item: any, index: any) => {
-                    return {key: index, columnName: item, ontology: []}
-                })
-            ));
-            setLoading(false);
-        }).catch((err) => {
-            message.error(err.toString())
-            setLoading(false)
-        });
-    }
 
     const getOntology = () => {
         ontologyService.getProperties("data", {classes: store.getState().mapping.classesSelected.toString()}).then((res) => {
@@ -41,9 +21,6 @@ const MappingDataProperties = () => {
     }
 
     useEffect(() => {
-        if (store.getState().mapping.properties.length === 0)
-            getMappingData();
-
         getOntology();
     }, [])
 

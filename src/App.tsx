@@ -12,7 +12,6 @@ import ProtectedRoute from "./utils/ProtectedRoute";
 import {Roles} from "./utils/Roles";
 import {Provider} from "react-redux";
 import store from "./store";
-import SampleData from "./parts/SampleData";
 import SelectData from "./parts/SelectData";
 import ListInstances from "./parts/ListInstances";
 import MappingDataProperties from "./parts/MappingDataProperties";
@@ -61,7 +60,6 @@ function App() {
                                 roles={[Roles.User, Roles.Admin]}><InstancePage/></ProtectedRoute>}>
                                 <Route path="" element={<Navigate to={"upload/"}/>}/>
                                 <Route path="upload/" element={<UploadFile/>}/>
-                                <Route path="sample/" element={<SampleData/>}/>
                                 <Route path="select/" element={<SelectData/>}/>
                             </Route>
                             <Route path={"/mapping"} element={<ProtectedRoute

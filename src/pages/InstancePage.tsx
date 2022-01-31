@@ -21,9 +21,6 @@ const InstancePage = () => {
             title: 'Load Data',
         },
         {
-            title: 'Sample Data',
-        },
-        {
             title: 'Select Columns',
         }
     ]);
@@ -34,9 +31,6 @@ const InstancePage = () => {
                 navigate("upload/")
                 break
             case 1:
-                navigate("sample/")
-                break
-            case 2:
                 navigate("select/")
                 break
         }
@@ -80,14 +74,9 @@ const InstancePage = () => {
                 setNextStep(store.getState().instance.file);
                 break
 
-            case 1: // sample
-                setNextStep(store.getState().instance.sample);
-                setPrevStep(true);
-                break
-
-            case 2: // select
+            case 1: // select
                 setDoneStep(store.getState().instance.columnsSelected.length > 0);
-                setPrevStep(true);
+                setPrevStep(false);
                 break
         }
     });

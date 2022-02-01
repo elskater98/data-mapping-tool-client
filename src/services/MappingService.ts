@@ -72,7 +72,7 @@ class MappingService {
             'Authorization': 'Bearer ' + this.authService.hasCredentials()
         };
 
-        return axios.post(this.configService.getConfig().api_url + '/mapping/process/' + ref, data, {headers: headers})
+        return axios.post(this.configService.getConfig().api_url + '/mapping/pre/process/' + ref, data, {headers: headers})
     }
 }
 

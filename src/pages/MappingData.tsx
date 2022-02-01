@@ -5,6 +5,7 @@ import {Button, message, Steps} from "antd";
 import {setIndex} from "../actions/mapping_actions";
 import MappingService from "../services/MappingService";
 
+
 const {Step} = Steps;
 const MappingData = () => {
     const [current, setCurrent] = useState(store.getState().mapping.index);
@@ -48,8 +49,16 @@ const MappingData = () => {
     };
 
     const done = () => {
-        mappingService.editMappingInstance(params['id'], {"finished": true}).then((res) => {
-            navigate("/mapping")
+        let storeValues = store.getState().mapping;
+        let properties: any = {}
+
+        for (const property of store.getState().mapping.properties) {
+            properties[property.columnName] = property.ontology
+        }
+
+        mappingService.runProcess(params.id, {
+            properties: properties,
+            classes: storeValues.classesSelected
         }).catch((err) => {
             message.error(err.toString())
         })

@@ -66,6 +66,14 @@ class MappingService {
         };
         return axios.patch(this.configService.getConfig().api_url + '/mapping/' + ref, data, {headers: headers})
     }
+
+    runProcess(ref: any, data: object) {
+        const headers = {
+            'Authorization': 'Bearer ' + this.authService.hasCredentials()
+        };
+
+        return axios.post(this.configService.getConfig().api_url + '/mapping/process/' + ref, data, {headers: headers})
+    }
 }
 
 export default MappingService;

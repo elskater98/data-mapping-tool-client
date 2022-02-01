@@ -1,8 +1,9 @@
 import {Fragment, useEffect, useState} from "react";
-import {message, Select, Table} from "antd";
+import {Col, message, Row, Select, Table} from "antd";
 import OntologyService from "../services/OntologyService";
 import store from "../store";
 import {setProperties} from "../actions/mapping_actions";
+import {Option} from "antd/es/mentions";
 
 const {Column} = Table;
 const MappingDataProperties = () => {
@@ -10,6 +11,10 @@ const MappingDataProperties = () => {
 
     const [loading, setLoading] = useState(false);
     const [options, setOptions] = useState<any>([]);
+    const [optionsType, setOptionsType] = useState<any>([{value: "string", label: "String"}, {
+        value: "number",
+        label: "Number"
+    }]);
 
 
     const getOntology = () => {
@@ -32,25 +37,32 @@ const MappingDataProperties = () => {
 
     return (
         <Fragment>
-            <Table size={"middle"} dataSource={store.getState().mapping.properties}
-                   bordered={true}
-                   loading={loading}
-                   scroll={{x: 1300}}>
-                <Column align={"center"} title={"Column"} dataIndex={"columnName"} key={"key"} width={"20%"}/>
-                <Column align={"center"} title={"Data Properties"} dataIndex={"ontologyValue"} key={"key"}
-                        render={(value, record: any, index) => (
-                            <Select
-                                mode="multiple"
-                                showSearch={true}
-                                allowClear={true}
-                                defaultValue={store.getState().mapping.properties[record.key].ontology}
-                                options={options}
-                                style={{width: "80%"}}
-                                onChange={(value: string) => onChange(value, record)}
-                            >
-                            </Select>
-                        )}/>
-            </Table>
+            <Row>
+                <Col span={1}/>
+                <Col span={22}>
+                    <Table size={"small"} dataSource={store.getState().mapping.properties}
+                           bordered={true}
+                           loading={loading}
+                           scroll={{x: 1300}}>
+                        <Column align={"center"} title={"Column"} dataIndex={"columnName"} key={"key"} width={"20%"}/>
+                        <Column align={"center"} title={"Data Properties"} dataIndex={"ontologyValue"} key={"key"}
+                                render={(value, record: any, index) => (
+                                    <Select
+                                        mode="multiple"
+                                        showSearch={true}
+                                        allowClear={true}
+                                        defaultValue={store.getState().mapping.properties[record.key].ontology}
+                                        options={options}
+                                        style={{width: "80%"}}
+                                        onChange={(value: string) => onChange(value, record)}
+                                    >
+                                    </Select>
+                                )}/>
+                    </Table>
+                </Col>
+                <Col span={1}/>
+            </Row>
+
         </Fragment>
     );
 }

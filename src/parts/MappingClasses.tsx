@@ -12,20 +12,18 @@ const MappingClasses = () => {
     const mappingService = new MappingService();
     const params = useParams();
     const [classes, setClasses] = useState<any>([]);
+    const [auxProperties, setAuxProperties] = useState<any>([]);
     const [loading, setLoading] = useState(false);
 
     const getMappingData = () => {
-        setLoading(true);
         mappingService.getMappingInstance(params['id']).then((res) => {
             store.dispatch(setProperties(
                 res.data['mappings']['selectedColumns'].map((item: any, index: any) => {
                     return {key: index, columnName: item, ontology: []}
                 })
             ));
-            setLoading(false);
         }).catch((err) => {
             message.error(err.toString())
-            setLoading(false)
         });
     }
 
@@ -40,7 +38,6 @@ const MappingClasses = () => {
     }
 
     useEffect(() => {
-        setLoading(true);
         if (store.getState().mapping.properties.length === 0)
             getMappingData();
         getOntologyClasses();
@@ -50,19 +47,23 @@ const MappingClasses = () => {
         store.dispatch(setSelectedClasses(value));
     }
 
+    store.subscribe(() => {
+        setAuxProperties(store.getState().mapping.properties)
+    })
+
     return (<Fragment>
-        <Form layout="vertical" style={{width: "80%", marginLeft: "10%"}}>
-            <Form.Item>
-                <Card loading={loading} style={{overflow: "auto", height: "5%"}}>
+        <Form layout="vertical" style={{width: "80%", marginLeft: "10%"}}
+              initialValues={{select_classes: store.getState().mapping.classesSelected}}>
+            <Form.Item label="Ontology Classes:" name="select_classes" style={{overflow: "auto", height: "5%"}}>
+                <Card loading={setAuxProperties.length == 0}>
                     {store.getState().mapping.properties.map((item: any) => {
-                        return (<Tag color={"blue"}>{item.columnName}</Tag>)
+                        return <Tag key={item.key} color={"blue"}>{item.columnName}</Tag>
                     })}
                 </Card>
             </Form.Item>
             <Form.Item label="Ontology Classes:" name="select_classes" rules={[{required: true}]}
                        tooltip={{title: 'Select the classes that will use.', icon: <InfoCircleOutlined/>}}>
                 <Select loading={loading}
-                        defaultValue={store.getState().mapping.classesSelected}
                         mode="multiple"
                         showSearch={true}
                         allowClear={true}

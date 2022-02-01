@@ -82,9 +82,9 @@ const MyInstancesPage = () => {
             <Column align={"center"} title="Filename" dataIndex="filename" key="filename"
                     sortDirections={['descend', 'ascend']}
                     sorter={{compare: (a: any, b: any) => alphabeticalSort(a.filename, b.filename), multiple: 3}}/>
-            <Column align={"center"} title="Raw Columns" dataIndex="rawColumns" key="rawColumns"
+            {/*<Column align={"center"} title="Raw Columns" dataIndex="rawColumns" key="rawColumns"
                     render={(i) => (<Fragment>{i.slice(0, 5).map((j: any) => (
-                        <Tag color="blue" key={j}>{j}</Tag>))}{i.length > 5 ? "..." : ""}</Fragment>)}/>
+                        <Tag color="blue" key={j}>{j}</Tag>))}{i.length > 5 ? "..." : ""}</Fragment>)}/>*/}
             <Column align={"center"} title="Selected Columns" dataIndex="selectedColumns" key="selectedColumns"
                     render={(i) => (<Fragment>{i.slice(0, 5).map((j: any) => (
                         <Tag color="green" key={j}>{j}</Tag>))}{i.length > 5 ? "..." : ""}</Fragment>)}/>

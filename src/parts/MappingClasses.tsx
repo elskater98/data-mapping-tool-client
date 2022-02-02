@@ -54,7 +54,7 @@ const MappingClasses = () => {
     return (<Fragment>
         <Form layout="vertical" style={{width: "80%", marginLeft: "10%"}}
               initialValues={{select_classes: store.getState().mapping.classesSelected}}>
-            <Form.Item label="Ontology Classes:" name="select_classes" style={{overflow: "auto", height: "5%"}}>
+            <Form.Item label="Available Columns:" name="available_columns" style={{overflow: "auto", height: "5%"}}>
                 <Card loading={setAuxProperties.length == 0}>
                     {store.getState().mapping.properties.map((item: any) => {
                         return <Tag key={item.key} color={"blue"}>{item.columnName}</Tag>

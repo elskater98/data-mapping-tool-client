@@ -4,6 +4,7 @@ import store from "../store";
 import {Button, message, Steps} from "antd";
 import {setIndex} from "../actions/mapping_actions";
 import MappingService from "../services/MappingService";
+import OntologyService from "../services/OntologyService";
 
 
 const {Step} = Steps;
@@ -15,11 +16,12 @@ const MappingData = () => {
     const navigate = useNavigate();
 
     const mappingService = new MappingService();
+    const ontologyService = new OntologyService();
     const params = useParams();
-    console.log(params)
+
     const [steps, setSteps] = useState([
         {
-            title: 'Map Classes',
+            title: 'Classes',
         },
         {
             title: 'Map Data Properties',
@@ -56,9 +58,21 @@ const MappingData = () => {
             properties[property.columnName] = property.ontology
         }
 
-        mappingService.runProcess(params.id, {
-            properties: properties,
-            classes: storeValues.classesSelected
+        ontologyService.getProperties("object", {classes: storeValues.classesSelected.toString()}).then((relations) => {
+            mappingService.editMappingInstance(params.id, {
+                properties: properties,
+                classes: storeValues.classesSelected,
+                relations: relations.data['data']
+            }).then((res) => {
+                mappingService.runProcess(params.id).then((res) => {
+                    message.success("Processing mapping....")
+                    navigate("/mapping")
+                }).catch((err) => {
+                    message.error(err.toString())
+                })
+            }).catch((err) => {
+                message.error(err.toString())
+            })
         }).catch((err) => {
             message.error(err.toString())
         })
@@ -109,6 +123,7 @@ const MappingData = () => {
                     Done
                 </Button>
             )}
+
             {current > 0 && (
                 <Button style={{margin: '0 8px'}} disabled={!prevStep} onClick={() => prev()}>
                     Previous

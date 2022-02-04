@@ -1,8 +1,7 @@
 import {combineReducers} from "@reduxjs/toolkit";
-import instanceReducer from "./instanceReducer";
-import mappingReducer from "./mappingReducer";
+import mainReducer from "./mainReducer";
 
 
-const rootReducer = combineReducers({instance: instanceReducer, mapping: mappingReducer})
+const rootReducer = combineReducers({main: mainReducer})
 
 export default rootReducer;

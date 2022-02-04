@@ -6,18 +6,11 @@ import LoginDrawer from "./parts/LoginDrawer";
 import NoFound from "./pages/NoFound";
 import {Navigate, Route, Routes, useNavigate} from "react-router-dom";
 import HomaPage from "./pages/HomaPage";
-import UploadFile from "./parts/UploadFile";
-import InstancePage from "./pages/InstancePage";
 import ProtectedRoute from "./utils/ProtectedRoute";
 import {Roles} from "./utils/Roles";
 import {Provider} from "react-redux";
 import store from "./store";
-import SelectData from "./parts/SelectData";
 import ListInstances from "./parts/ListInstances";
-import MappingDataProperties from "./parts/MappingDataProperties";
-import MappingInstancesPage from "./pages/MappingInstancesPage";
-import MappingData from "./pages/MappingData";
-import MappingClasses from "./parts/MappingClasses";
 
 // Components
 const {Header, Content, Footer} = Layout;
@@ -55,23 +48,11 @@ function App() {
                     <div className="site-layout-background"
                          style={{margin: '25px 0', padding: 24, minHeight: 380, height: "85vh"}}>
                         <Routes>
-                            <Route path="/" element={<HomaPage/>}/>
-                            <Route path="/instance" element={<ProtectedRoute
-                                roles={[Roles.User, Roles.Admin]}><InstancePage/></ProtectedRoute>}>
-                                <Route path="" element={<Navigate to={"upload/"}/>}/>
-                                <Route path="upload/" element={<UploadFile/>}/>
-                                <Route path="select/" element={<SelectData/>}/>
+                            <Route path="/" element={<ProtectedRoute
+                                roles={[Roles.User, Roles.Admin]}><HomaPage/></ProtectedRoute>}>
+                                <Route path={""} element={<Navigate to={"instances/"}/>}/>
+                                <Route path={"instances/"} element={<ListInstances/>}/>
                             </Route>
-                            <Route path={"/mapping"} element={<ProtectedRoute
-                                roles={[Roles.User, Roles.Admin]}><MappingInstancesPage/></ProtectedRoute>}>
-                                <Route path="" element={<ListInstances/>}/>
-                                <Route path=":id/" element={<MappingData/>}>
-                                    <Route path="" element={<Navigate to={"classes/"}/>}/>
-                                    <Route path="classes/" element={<MappingClasses/>}/>
-                                    <Route path="properties/data/" element={<MappingDataProperties/>}/>
-                                </Route>
-                            </Route>
-
                             <Route path="*" element={<NoFound/>}/>
                         </Routes>
                     </div>

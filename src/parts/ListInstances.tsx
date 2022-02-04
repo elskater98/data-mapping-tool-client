@@ -34,11 +34,27 @@ const MyInstancesPage = () => {
     const [form] = Form.useForm();
 
     const onFinish = (values: any) => {
-        console.log(values)
+        values['filenames'] = values.upload_file.fileList.map((i: any) => {
+            return i.name
+        });
+
+        delete values.upload_file;
+        instanceService.createInstances(values).then((res) => {
+            gatherInstances();
+            closeModal();
+            message.success("The instances has been created successfully.")
+        }).catch((err: any) => {
+            message.error(err.toString())
+        })
+
     }
 
     // Gather Data
     useEffect(() => {
+        gatherInstances()
+    }, [])
+
+    const gatherInstances = () => {
         instanceService.getInstances().then((res) => {
             let _data = res.data["data"].map((i: any, index: number) => {
                 i['key'] = i['ref']
@@ -50,7 +66,7 @@ const MyInstancesPage = () => {
         }).catch((err) => {
             message.error(err.toString())
         });
-    }, [])
+    }
 
     // Modal
 
@@ -64,8 +80,9 @@ const MyInstancesPage = () => {
     }
 
 
-    const create = (ref: string) => {
+    const startMapping = (ref: string) => {
 
+        // TODO: redirect to the correspondent url
         navigate("/mapping/" + ref)
     }
 
@@ -87,12 +104,9 @@ const MyInstancesPage = () => {
         if (status !== 'uploading') {
             console.log(info.file, info.fileList);
         }
-        if (status === 'done') {
-            message.success(`${info.file.name} file uploaded successfully.`, 2);
-        } else if (status === 'error') {
+        if (status === 'error') {
             message.error(`${info.file.name} file upload failed.`, 2);
         }
-
     }
 
     return (<Fragment>
@@ -107,7 +121,7 @@ const MyInstancesPage = () => {
                 <Form form={form} layout={"vertical"} onFinish={onFinish}>
                     <Row>
                         <Col span={10}>
-                            <Form.Item name={"instance_name"} label={"Name"} rules={[{required: true}]}>
+                            <Form.Item name={"name"} label={"Name"} rules={[{required: true}]}>
                                 <Input placeholder={"Instance Name"}/>
                             </Form.Item>
                             <Form.Item name={"description"} label={"Description"}>
@@ -116,7 +130,7 @@ const MyInstancesPage = () => {
                         </Col>
                         <Col span={2}/>
                         <Col span={10}>
-                            <Form.Item name={"upload_file"} label={"Upload Data"}>
+                            <Form.Item name={"upload_file"} label={"Upload Data"} required={true}>
                                 <Dragger accept={".json,.csv"}
                                          action={configService.api_url + "/files/upload"}
                                          headers={{Authorization: "Bearer " + authService.hasCredentials()}}
@@ -207,7 +221,7 @@ const MyInstancesPage = () => {
                                             <Col span={5}>
                                                 <Tooltip title="Start Mapping">
                                                     <Button shape="circle" icon={<CaretRightOutlined/>} onClick={() => {
-                                                        create(i['ref']);
+                                                        startMapping(i['ref']);
                                                     }}/>
                                                 </Tooltip>
                                             </Col>

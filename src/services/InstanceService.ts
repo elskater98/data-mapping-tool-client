@@ -37,7 +37,7 @@ class InstanceService {
 
     }
 
-    editInstances(ref: string, payload: object) {
+    editInstances(ref: any, payload: object) {
         const headers = {
             'Authorization': 'Bearer ' + this.authService.hasCredentials()
         };

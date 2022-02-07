@@ -17,14 +17,13 @@ class InstanceService {
         return axios.get(this.configService.getConfig().api_url + '/instances/', {headers: headers});
     }
 
-    getInstance(ref: string, args: object) {
+    getInstance(ref: any) {
         const headers = {
             'Authorization': 'Bearer ' + this.authService.hasCredentials()
         };
 
         return axios.get(this.configService.getConfig().api_url + '/instances/' + ref, {
-            headers: headers,
-            params: args
+            headers: headers
         });
 
     }

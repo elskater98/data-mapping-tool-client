@@ -1,9 +1,9 @@
 import React, {Fragment, useEffect, useState} from "react";
-import {Button, Col, Form, Input, message, Modal, Popconfirm, Progress, Row, Table, Tag, Tooltip, Upload} from "antd";
+import {Button, Col, Form, Input, message, Modal, Popconfirm, Progress, Row, Table, Tooltip, Upload} from "antd";
 import {
-    CaretRightOutlined,
     DeleteOutlined,
     DownloadOutlined,
+    EditOutlined,
     InboxOutlined,
     PlusOutlined,
     QuestionCircleOutlined,
@@ -80,7 +80,7 @@ const MyInstancesPage = () => {
     }
 
 
-    const startMapping = (ref: string) => {
+    const mapping = (ref: string) => {
 
         // TODO: redirect to the correspondent url
         navigate("/mapping/" + ref)
@@ -219,9 +219,9 @@ const MyInstancesPage = () => {
                                     <Fragment>
                                         <Row>
                                             <Col span={5}>
-                                                <Tooltip title="Start Mapping">
-                                                    <Button shape="circle" icon={<CaretRightOutlined/>} onClick={() => {
-                                                        startMapping(i['ref']);
+                                                <Tooltip title="Mapping">
+                                                    <Button shape="circle" icon={<EditOutlined/>} onClick={() => {
+                                                        mapping(i['ref']);
                                                     }}/>
                                                 </Tooltip>
                                             </Col>

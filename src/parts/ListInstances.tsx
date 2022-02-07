@@ -3,7 +3,7 @@ import {Button, Col, Form, Input, message, Modal, Popconfirm, Progress, Row, Tab
 import {
     DeleteOutlined,
     DownloadOutlined,
-    EditOutlined,
+    BuildOutlined,
     InboxOutlined,
     PlusOutlined,
     QuestionCircleOutlined,
@@ -83,7 +83,7 @@ const MyInstancesPage = () => {
     const mapping = (ref: string) => {
 
         // TODO: redirect to the correspondent url
-        navigate("/mapping/" + ref)
+        navigate(ref)
     }
 
     const deleteInstance = (ref: string) => {
@@ -220,7 +220,7 @@ const MyInstancesPage = () => {
                                         <Row>
                                             <Col span={5}>
                                                 <Tooltip title="Mapping">
-                                                    <Button shape="circle" icon={<EditOutlined/>} onClick={() => {
+                                                    <Button shape="circle" icon={<BuildOutlined />} onClick={() => {
                                                         mapping(i['ref']);
                                                     }}/>
                                                 </Tooltip>

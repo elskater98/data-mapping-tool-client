@@ -11,7 +11,7 @@ import {Roles} from "./utils/Roles";
 import {Provider} from "react-redux";
 import store from "./store";
 import ListInstances from "./parts/ListInstances";
-import MappingPage from "./pages/MappingPage";
+import InstanceDetailPage from "./pages/InstanceDetailPage";
 
 // Components
 const {Header, Content, Footer} = Layout;
@@ -53,7 +53,7 @@ function App() {
                                 roles={[Roles.User, Roles.Admin]}><HomaPage/></ProtectedRoute>}>
                                 <Route path={""} element={<Navigate to={"instances/"}/>}/>
                                 <Route path={"instances/"} element={<ListInstances/>}/>
-                                <Route path={"mapping/:id"} element={<MappingPage/>}/>
+                                <Route path={"instances/:id"} element={<InstanceDetailPage/>}/>
                             </Route>
                             <Route path="*" element={<NoFound/>}/>
                         </Routes>

@@ -1,23 +1,25 @@
 import {useParams} from "react-router-dom";
 import React, {useEffect, useState} from "react";
 import OntologyService from "../services/OntologyService";
-import {Button, Card, Col, Form, message, Modal, Progress, Row, Select, Table, Tag} from "antd";
+import {Button, Card, Col, Form, List, message, Modal, Progress, Row, Select, Table, Tag} from "antd";
 import InstanceService from "../services/InstanceService";
-import {PlusCircleOutlined, SettingOutlined} from '@ant-design/icons';
+import {PlusOutlined, SettingOutlined, DownOutlined} from '@ant-design/icons';
 import {useForm} from "antd/lib/form/Form";
 
 const {Column} = Table;
 const {Meta} = Card;
-const MappingPage = () => {
+const InstanceDetailPage = () => {
     const params = useParams();
+
     const ontologyService = new OntologyService();
     const instanceService = new InstanceService();
+
     const [classes, setClasses] = useState<any>([]);
     const [instance, setInstance] = useState<any>({});
     const [loading, setLoading] = useState(false);
     const [visible, setVisible] = useState(false);
+
     const [form] = useForm();
-    const [selected, setSelected] = useState<any>([]);
 
     const getInstanceInfo = () => {
         setLoading(true)
@@ -79,14 +81,29 @@ const MappingPage = () => {
             </Form>
         </Modal>
 
-
         <Row>
             <Col span={1}/>
-            <Col span={10}>
+            <Col span={10} style={{scrollBehavior: "smooth", overflow: "auto", height: "75vh"}}>
+                <div style={{width: "50vh"}}>
+                    <List itemLayout={"vertical"}
+                          size={"small"}
+                          dataSource={instance.classes_to_map}
+                          renderItem={(item: any) => (
+                              <List.Item>
+                                  <Row>
+                                      <Col span={12}>{item}:</Col>
+                                      <Col span={12}>
+                                          <Button size={"small"} shape={"circle"} icon={<PlusOutlined/>}/>
+                                      </Col>
+                                  </Row>
+                              </List.Item>)
+                          }>
+                    </List>
+                </div>
 
             </Col>
             <Col span={2} style={{paddingLeft: "2%"}}>
-                <Button shape={"circle"} icon={<PlusCircleOutlined/>} onClick={showModal}/>
+                <Button type={"primary"} shape="circle" icon={<DownOutlined/>} onClick={showModal}/>
             </Col>
             <Col span={10}>
                 <Card loading={loading} title={"Instance ref.: " + params.id}
@@ -110,4 +127,4 @@ const MappingPage = () => {
     </>)
 
 }
-export default MappingPage;
+export default InstanceDetailPage;

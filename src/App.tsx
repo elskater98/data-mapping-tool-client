@@ -12,6 +12,7 @@ import {Provider} from "react-redux";
 import store from "./store";
 import ListInstances from "./parts/ListInstances";
 import InstanceDetailPage from "./pages/InstanceDetailPage";
+import MappingInstance from "./parts/MappingInstance";
 
 // Components
 const {Header, Content, Footer} = Layout;
@@ -54,6 +55,7 @@ function App() {
                                 <Route path={""} element={<Navigate to={"instances/"}/>}/>
                                 <Route path={"instances/"} element={<ListInstances/>}/>
                                 <Route path={"instances/:id"} element={<InstanceDetailPage/>}/>
+                                <Route path={"instances/:id/mapping"} element={<MappingInstance/>}/>
                             </Route>
                             <Route path="*" element={<NoFound/>}/>
                         </Routes>

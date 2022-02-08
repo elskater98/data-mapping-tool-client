@@ -1,12 +1,11 @@
-import {useParams} from "react-router-dom";
+import {useNavigate, useParams} from "react-router-dom";
 import React, {useEffect, useState} from "react";
 import OntologyService from "../services/OntologyService";
-import {Button, Card, Col, Form, List, message, Modal, Progress, Row, Select, Table, Tag} from "antd";
+import {Button, Card, Col, Form, List, message, Modal, Progress, Row, Select, Tag} from "antd";
 import InstanceService from "../services/InstanceService";
-import {PlusOutlined, SettingOutlined, DownOutlined} from '@ant-design/icons';
+import {DownOutlined, PlusOutlined, SettingOutlined} from '@ant-design/icons';
 import {useForm} from "antd/lib/form/Form";
 
-const {Column} = Table;
 const {Meta} = Card;
 const InstanceDetailPage = () => {
     const params = useParams();
@@ -20,6 +19,7 @@ const InstanceDetailPage = () => {
     const [visible, setVisible] = useState(false);
 
     const [form] = useForm();
+    const navigate = useNavigate();
 
     const getInstanceInfo = () => {
         setLoading(true)
@@ -62,21 +62,38 @@ const InstanceDetailPage = () => {
 
     const onFinish = () => {
         let values = form.getFieldValue('select');
-        instanceService.editInstances(params.id, {classes_to_map: values}).then((res) => {
-            setInstance({...instance, classes_to_map: values})
+        setInstance({...instance, classes_to_map: values});
+
+        let aux_map: any = instance.mapping;
+        if (Object.keys(instance.mapping).length == 0) {
+            for (let i of classes) {
+                aux_map[i.label] = {columns: {}, status: false}
+            }
+            setInstance({...instance, mapping: aux_map})
+        }
+
+        instanceService.editInstances(params.id, {
+            classes_to_map: values,
+            mapping: aux_map
+        }).then((res) => {
             closeModal();
+            setInstance({...instance, classes_to_map: values})
         }).catch((err) => {
             message.error(err.toString())
         })
     }
 
+    const startMapping = (_class: string) => {
+        navigate('mapping', {state: {ref: params.id, _class: _class, files: instance.filenames}});
+    }
 
     return (<>
         <Modal visible={visible} onCancel={closeModal} onOk={form.submit}>
             <Form layout={"vertical"} form={form} onFinish={onFinish}>
-                <Form.Item name={"select"} label={"Classes"} rules={[{required: true}]}>
+                <Form.Item name={"select"} label={"Classes"} rules={[{required: true}]}
+                           initialValue={instance.classes_to_map}>
                     <Select mode="multiple" placeholder="Select the class/es that you would like to map."
-                            options={classes} defaultValue={instance.classes_to_map}/>
+                            options={classes}/>
                 </Form.Item>
             </Form>
         </Modal>
@@ -93,7 +110,9 @@ const InstanceDetailPage = () => {
                                   <Row>
                                       <Col span={12}>{item}:</Col>
                                       <Col span={12}>
-                                          <Button size={"small"} shape={"circle"} icon={<PlusOutlined/>}/>
+                                          <Button size={"small"} shape={"circle"} icon={<PlusOutlined/>}
+                                                  onClick={() => startMapping(item)}/>
+                                          {instance.mapping[item]?.toString()}
                                       </Col>
                                   </Row>
                               </List.Item>)
@@ -106,7 +125,7 @@ const InstanceDetailPage = () => {
                 <Button type={"primary"} shape="circle" icon={<DownOutlined/>} onClick={showModal}/>
             </Col>
             <Col span={10}>
-                <Card loading={loading} title={"Instance ref.: " + params.id}
+                <Card loading={loading} title={"Ref.: " + params.id}
                       actions={[<SettingOutlined onClick={editInstance} key="setting"/>]}>
                     <Meta title={<b>{instance.name}</b>}/>
                     <div style={{marginTop: "1%"}}>

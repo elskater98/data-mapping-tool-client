@@ -20,6 +20,7 @@ const MappingInstance = (props: any) => {
     const [instance, setInstance] = useState<any>({})
     const [properties, setProperties] = useState<any>([])
     const [loading, setLoading] = useState(false)
+    const [mapping, setMapping] = useState<any>({})
 
     const getSample = () => {
         setLoading(true)
@@ -59,8 +60,15 @@ const MappingInstance = (props: any) => {
         navigate(-1)
     }
 
+    const submit = () => {
+        setInstance({...instance,mapping:{...instance.mapping,[_class]:{...instance.mapping[_class],columns:mapping}}})
+        console.log(instance)
+    }
+
     const onChange = (selectedValue: any, ontology_value: any) => {
-        instanceService.editInstances(ref, {[instance.mapping[ontology_value.domain].columns[ontology_value.name]]: selectedValue})
+        let newMapping = mapping;
+        newMapping[ontology_value.name] = selectedValue
+        setMapping(newMapping);
     }
 
     useEffect(() => {
@@ -73,11 +81,11 @@ const MappingInstance = (props: any) => {
         <>
             <Row>
                 <Col span={24}>
-                    <Table bordered={true} loading={properties.length == 0} dataSource={properties}>
+                    <Table bordered={true} loading={properties.length === 0} dataSource={properties}>
                         <Column title={"Property"} dataIndex={"value"}/>
                         <Column title={"Column"} render={(ontology_value, record, index) => {
                             return (<>
-                                <Select mode={"multiple"} style={{width: "50vh"}} loading={columns.length == 0}
+                                <Select mode={"multiple"} style={{width: "50vh"}} loading={columns.length === 0}
                                         options={columns} onChange={(selectedValue, option) => {
                                     onChange(selectedValue, ontology_value)
                                 }}/>
@@ -89,6 +97,7 @@ const MappingInstance = (props: any) => {
             <Row>
                 <Col>
                     <Button onClick={back}>Back</Button>
+                    <Button style={{marginLeft: "1vh"}} onClick={submit}>Submit</Button>
                 </Col>
             </Row>
 

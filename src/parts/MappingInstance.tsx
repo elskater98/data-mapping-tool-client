@@ -1,9 +1,10 @@
 import {useLocation, useNavigate} from "react-router-dom";
-import {Button, Col, message, Row, Select, Steps, Table} from "antd";
-import {useEffect, useState} from "react";
+import {Button, Col, message, Popconfirm, Row, Select, Space, Steps, Table} from "antd";
+import React, {useEffect, useState} from "react";
 import InstanceService from "../services/InstanceService";
 import FileService from "../services/FileService";
 import OntologyService from "../services/OntologyService";
+import {LockOutlined, UnlockOutlined, QuestionCircleOutlined} from "@ant-design/icons";
 
 const {Column} = Table;
 
@@ -23,6 +24,7 @@ const MappingInstance = (props: any) => {
     const [instance, setInstance] = useState<any>({})
     const [properties, setProperties] = useState<any>([])
     const [mapping, setMapping] = useState<any>({})
+    const [lock, setLock] = useState(true);
 
 
     const getSample = (filename: string) => {
@@ -72,10 +74,16 @@ const MappingInstance = (props: any) => {
         setMapping({...mapping, ...mapping[ontology_value.name], [ontology_value.name]: selectedValue});
     }
 
+    const resetFields = () => {
+
+    }
+
     const onChangeSelectFile = (value: string) => {
         setSelectedFile(value);
         getSample(value);
+        resetFields();
     }
+
     useEffect(() => {
         getOntology()
         getSample(current_file)
@@ -86,8 +94,16 @@ const MappingInstance = (props: any) => {
         <>
             <Row style={{marginBottom: "3vh"}}>
                 <Col span={24}>
-                    <Select style={{width: "50vh"}} options={files} loading={files.length === 0} value={selectedFile}
+                    <Select disabled={lock} style={{width: "50vh"}} options={files} loading={files.length === 0}
+                            value={selectedFile}
                             onChange={(value: string) => onChangeSelectFile(value)}/>
+
+                    <Popconfirm title="Are you sure？" onConfirm={() => {
+                        setLock(!lock)
+                    }}
+                                icon={<QuestionCircleOutlined style={{color: 'red'}}/>}>
+                        <Button type={"text"} icon={lock ? <LockOutlined/> : <UnlockOutlined/>}/>
+                    </Popconfirm>
                 </Col>
             </Row>
 

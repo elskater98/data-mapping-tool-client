@@ -38,6 +38,7 @@ const MappingInstance = (props: any) => {
         setLoading(true)
         instanceService.getInstance(ref).then((res) => {
             setInstance(res.data.data);
+            console.log(res.data.data)
             setLoading(false);
         }).catch((err) => {
             message.error(err.toString());
@@ -61,8 +62,10 @@ const MappingInstance = (props: any) => {
     }
 
     const submit = () => {
-        setInstance({...instance,mapping:{...instance.mapping,[_class]:{...instance.mapping[_class],columns:mapping}}})
-        console.log(instance)
+        let newInstance = instance;
+        newInstance.mapping[_class].columns = mapping
+        instanceService.editInstances(ref, newInstance)
+        // setInstance({...instance,mapping:{...instance.mapping,[_class]:{...instance.mapping[_class],columns:mapping}}})
     }
 
     const onChange = (selectedValue: any, ontology_value: any) => {

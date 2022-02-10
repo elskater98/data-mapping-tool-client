@@ -67,7 +67,7 @@ const InstanceDetailPage = () => {
         let aux_map: any = instance.mapping;
         if (Object.keys(instance.mapping).length == 0) {
             for (let i of classes) {
-                aux_map[i.label] = {columns: {}, status: false}
+                aux_map[i.label] = {status: false}
             }
             setInstance({...instance, mapping: aux_map})
         }

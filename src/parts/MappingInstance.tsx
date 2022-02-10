@@ -11,22 +11,22 @@ const MappingInstance = (props: any) => {
 
     const {state} = useLocation();
     const navigate = useNavigate()
-    const {ref, _class, files}: any = state;
+    const {ref, _class, files, current_file}: any = state;
 
-    const [current, setCurrent] = useState(0);
-    const [selectedFile, setSelectedFile] = useState(null);
+    const [selectedFile, setSelectedFile] = useState(current_file);
 
     const instanceService = new InstanceService();
     const ontologyService = new OntologyService();
     const fileService = new FileService();
+
     const [columns, setColumns] = useState<any>([])
     const [instance, setInstance] = useState<any>({})
     const [properties, setProperties] = useState<any>([])
     const [mapping, setMapping] = useState<any>({})
 
 
-    const getSample = () => {
-        fileService.sample(files[0].value).then((res) => {
+    const getSample = (filename: string) => {
+        fileService.sample(filename).then((res) => {
             setColumns(res.data.columns.map((i: any) => {
                 return {value: i, label: i}
             }))
@@ -40,7 +40,6 @@ const MappingInstance = (props: any) => {
         instanceService.getInstance(ref).then((res) => {
             setInstance(res.data.data);
             setMapping(res.data.data.mapping[_class].columns);
-            setSelectedFile(res.data.data.mapping[_class].fileSelected)
         }).catch((err) => {
             message.error(err.toString());
         })
@@ -62,25 +61,24 @@ const MappingInstance = (props: any) => {
     const submit = () => {
         let newInstance = instance;
         newInstance.mapping[_class].columns = mapping
-        instanceService.editInstances(ref, newInstance)
+        newInstance.mapping[_class].fileSelected = selectedFile
+        instanceService.editInstances(ref, newInstance).catch((err) => {
+            message.error(err.toString())
+        })
         navigate(-1);
     }
 
-    const next = () => {
-        setCurrent(current + 1);
-    };
-
-    const prev = () => {
-        setCurrent(current - 1);
-    };
-
-    const onChange = (selectedValue: any, ontology_value: any) => {
+    const onChangeTable = (selectedValue: any, ontology_value: any) => {
         setMapping({...mapping, ...mapping[ontology_value.name], [ontology_value.name]: selectedValue});
     }
 
+    const onChangeSelectFile = (value: string) => {
+        setSelectedFile(value);
+        getSample(value);
+    }
     useEffect(() => {
         getOntology()
-        getSample()
+        getSample(current_file)
         getInstance()
     }, [])
 
@@ -89,7 +87,7 @@ const MappingInstance = (props: any) => {
             <Row style={{marginBottom: "3vh"}}>
                 <Col span={24}>
                     <Select style={{width: "50vh"}} options={files} loading={files.length === 0} value={selectedFile}
-                            onChange={(value => setSelectedFile(value))}/>
+                            onChange={(value: string) => onChangeSelectFile(value)}/>
                 </Col>
             </Row>
 
@@ -103,7 +101,7 @@ const MappingInstance = (props: any) => {
                                         loading={columns.length === 0}
                                         value={mapping[ontology_value.name]}
                                         options={columns} onChange={(selectedValue, option) => {
-                                    onChange(selectedValue, ontology_value)
+                                    onChangeTable(selectedValue, ontology_value)
                                 }}/>
                             </>)
                         }}/>

@@ -67,7 +67,7 @@ const InstanceDetailPage = () => {
         let aux_map: any = instance.mapping;
         if (Object.keys(instance.mapping).length == 0) {
             for (let i of classes) {
-                aux_map[i.label] = {status: false, fileSelected: null, columns: {}}
+                aux_map[i.label] = {status: false, fileSelected: instance.filenames[0], columns: {}}
             }
             setInstance({...instance, mapping: aux_map})
         }
@@ -86,7 +86,10 @@ const InstanceDetailPage = () => {
     const startMapping = (_class: string) => {
         navigate('mapping', {
             state: {
-                ref: params.id, _class: _class, files: instance.filenames.map((i: any) => {
+                ref: params.id,
+                _class: _class,
+                current_file: instance.mapping[_class].fileSelected,
+                files: instance.filenames.map((i: any) => {
                     return {value: i, label: i}
                 })
             }

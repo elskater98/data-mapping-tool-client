@@ -16,12 +16,21 @@ const MappingInstance = (props: any) => {
     const instanceService = new InstanceService();
     const ontologyService = new OntologyService();
     const fileService = new FileService();
-
     const [columns, setColumns] = useState<any>([])
     const [instance, setInstance] = useState<any>({})
     const [properties, setProperties] = useState<any>([])
     const [mapping, setMapping] = useState<any>({})
 
+
+    const getSample = () => {
+        fileService.sample(files[0]).then((res) => {
+            setColumns(res.data.columns.map((i: any) => {
+                return {value: i, label: i}
+            }))
+        }).catch((err) => {
+            message.error(err.toString())
+        })
+    }
 
     const getInstance = () => {
 
@@ -53,13 +62,12 @@ const MappingInstance = (props: any) => {
     }
 
     const onChange = (selectedValue: any, ontology_value: any) => {
-        let newMapping = mapping;
-        newMapping[ontology_value.name] = selectedValue
-        setMapping(newMapping);
+        setMapping({...mapping, ...mapping[ontology_value.name], [ontology_value.name]: selectedValue});
     }
 
     useEffect(() => {
         getOntology()
+        getSample()
         getInstance()
     }, [])
 
@@ -72,8 +80,8 @@ const MappingInstance = (props: any) => {
                         <Column title={"Column"} render={(ontology_value, record, index) => {
                             return (<>
                                 <Select mode={"multiple"} style={{width: "50vh"}}
-                                        loading={columns.length === 0 && Object.keys(mapping).length === 0}
-                                        defaultValue={mapping[ontology_value.name]}
+                                        loading={columns.length === 0}
+                                        value={mapping[ontology_value.name]}
                                         options={columns} onChange={(selectedValue, option) => {
                                     onChange(selectedValue, ontology_value)
                                 }}/>

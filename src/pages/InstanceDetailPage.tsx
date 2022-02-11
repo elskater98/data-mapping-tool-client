@@ -1,25 +1,40 @@
 import {useNavigate, useParams} from "react-router-dom";
 import React, {useEffect, useState} from "react";
 import OntologyService from "../services/OntologyService";
-import {Button, Card, Col, Form, List, message, Modal, Progress, Row, Select, Tag} from "antd";
+import {Button, Card, Col, Form, Input, List, message, Modal, Progress, Row, Select, Table, Tag, Upload} from "antd";
 import InstanceService from "../services/InstanceService";
-import {DownOutlined, PlusOutlined, SettingOutlined} from '@ant-design/icons';
+import {DownOutlined, AppstoreAddOutlined, SettingOutlined, InboxOutlined} from '@ant-design/icons';
 import {useForm} from "antd/lib/form/Form";
+import {alphabeticalSort} from "../utils/sorter";
+import ConfigService from "../services/ConfigService";
+import AuthService from "../services/AuthService";
 
+const {Column} = Table;
 const {Meta} = Card;
+const {Dragger} = Upload;
 const InstanceDetailPage = () => {
     const params = useParams();
 
     const ontologyService = new OntologyService();
     const instanceService = new InstanceService();
+    const configService = new ConfigService().getConfig()
+    const authService = new AuthService()
 
     const [classes, setClasses] = useState<any>([]);
     const [instance, setInstance] = useState<any>({});
     const [loading, setLoading] = useState(false);
-    const [visible, setVisible] = useState(false);
+    const [visibleClasses, setVisibleClasses] = useState(false);
+    const [visibleEditInstance, setVisibleEditInstance] = useState(false);
 
-    const [form] = useForm();
+    const [classesForm] = useForm();
+    const [editForm] = useForm();
+
     const navigate = useNavigate();
+
+    useEffect(() => {
+        getInstanceInfo();
+        getClasses();
+    }, []);
 
     const getInstanceInfo = () => {
         setLoading(true)
@@ -41,27 +56,19 @@ const InstanceDetailPage = () => {
         });
     }
 
-    const editInstance = () => {
-        console.log(params.id)
-        console.log(instance)
+    // Class Modal
+
+    const closeClasses = () => {
+        setVisibleClasses(false);
+        classesForm.resetFields();
     }
 
-    useEffect(() => {
-        getInstanceInfo();
-        getClasses();
-    }, []);
-
-    const closeModal = () => {
-        setVisible(false);
-        form.resetFields();
+    const showClasses = () => {
+        setVisibleClasses(true);
     }
 
-    const showModal = () => {
-        setVisible(true);
-    }
-
-    const onFinish = () => {
-        let values = form.getFieldValue('select');
+    const onFinishClasses = () => {
+        let values = classesForm.getFieldValue('select');
         setInstance({...instance, classes_to_map: values});
 
         let aux_map: any = instance.mapping;
@@ -76,12 +83,40 @@ const InstanceDetailPage = () => {
             classes_to_map: values,
             mapping: aux_map
         }).then((res) => {
-            closeModal();
             setInstance({...instance, classes_to_map: values})
+            closeClasses();
         }).catch((err) => {
             message.error(err.toString())
         })
     }
+
+    // Edit Instance Modal
+
+    const showEditInstance = () => {
+        setVisibleEditInstance(true);
+    }
+
+    const closeEditInstance = () => {
+        setVisibleEditInstance(false);
+        editForm.resetFields()
+    }
+
+    const onFinishEditInstance = () => {
+
+    }
+
+    const onChangeDragger = (info: any) => {
+        const {status} = info.file;
+        if (status !== 'uploading') {
+            console.log(info.file, info.fileList);
+        }
+        if (status === 'error') {
+            message.error(`${info.file.name} file upload failed.`, 2);
+        }
+    }
+
+    // Mapping
+
 
     const startMapping = (_class: string) => {
         navigate('mapping', {
@@ -96,9 +131,11 @@ const InstanceDetailPage = () => {
         });
     }
 
+
     return (<>
-        <Modal visible={visible} onCancel={closeModal} onOk={form.submit}>
-            <Form layout={"vertical"} form={form} onFinish={onFinish}>
+        {/* Classes Modal */}
+        <Modal visible={visibleClasses} onCancel={closeClasses} onOk={classesForm.submit}>
+            <Form layout={"vertical"} form={classesForm} onFinish={onFinishClasses}>
                 <Form.Item name={"select"} label={"Classes"} rules={[{required: true}]}
                            initialValue={instance.classes_to_map}>
                     <Select mode="multiple" placeholder="Select the class/es that you would like to map."
@@ -107,35 +144,70 @@ const InstanceDetailPage = () => {
             </Form>
         </Modal>
 
+        {/* Edit Instance Modal */}
+
+        <Modal
+            width={"100vh"}
+            visible={visibleEditInstance}
+            title="Create Instance"
+            onCancel={closeEditInstance}
+            onOk={editForm.submit}>
+
+            <Form form={editForm} layout={"vertical"}
+                  initialValues={{name: instance.name, description: instance.description}}
+                  onFinish={onFinishEditInstance}>
+                <Row>
+                    <Col span={10}>
+                        <Form.Item name={"name"} label={"Name"} rules={[{required: true}]}>
+                            <Input placeholder={"Instance Name"}/>
+                        </Form.Item>
+                        <Form.Item name={"description"} label={"Description"}>
+                            <Input.TextArea showCount maxLength={280}/>
+                        </Form.Item>
+                    </Col>
+                    <Col span={2}/>
+                    <Col span={10}>
+                        <Form.Item name={"upload_file"} label={"Upload Data"} rules={[{required: true}]}>
+                            <Dragger accept={".json,.csv"}
+                                     action={configService.api_url + "/files/upload"}
+                                     headers={{Authorization: "Bearer " + authService.hasCredentials()}}
+                                     onChange={onChangeDragger}>
+                                <p className="ant-upload-drag-icon">
+                                    <InboxOutlined/>
+                                </p>
+                                <p className="ant-upload-text">Click or drag file to this area to upload</p>
+                                <p className="ant-upload-hint">
+                                    Support for a single or bulk upload. Strictly prohibit from uploading company
+                                    data or other
+                                    band files.
+                                </p>
+                            </Dragger>
+                        </Form.Item>
+                    </Col>
+                </Row>
+            </Form>
+        </Modal>
+
         <Row>
             <Col span={1}/>
             <Col span={10} style={{scrollBehavior: "smooth", overflow: "auto", height: "75vh"}}>
-                <div style={{width: "50vh"}}>
-                    <List itemLayout={"vertical"}
-                          size={"small"}
-                          dataSource={instance.classes_to_map}
-                          renderItem={(item: any) => (
-                              <List.Item>
-                                  <Row>
-                                      <Col span={12}>{item}:</Col>
-                                      <Col span={12}>
-                                          <Button size={"small"} shape={"circle"} icon={<PlusOutlined/>}
-                                                  onClick={() => startMapping(item)}/>
-                                          {/*{instance.ref?.toString()}*/}
-                                      </Col>
-                                  </Row>
-                              </List.Item>)
-                          }>
-                    </List>
-                </div>
+                <Table bordered={true} size={"middle"} dataSource={instance.classes_to_map}>
+                    <Column width={"80vh"} title={"Class"}
+                            sortDirections={['descend', 'ascend']}
+                            sorter={{compare: (a: any, b: any) => alphabeticalSort(a, b)}}/>
+                    <Column align={"center"} title={"Actions"} render={(value, record, index) => {
+                        return <Button size={"small"} shape={"circle"} icon={<AppstoreAddOutlined/>}
+                                       onClick={() => startMapping(value)}/>
+                    }}/>
+                </Table>
 
             </Col>
             <Col span={2} style={{paddingLeft: "2%"}}>
-                <Button type={"primary"} shape="circle" icon={<DownOutlined/>} onClick={showModal}/>
+                <Button type={"primary"} shape="circle" icon={<DownOutlined/>} onClick={showClasses}/>
             </Col>
             <Col span={10}>
                 <Card loading={loading} title={"Ref.: " + params.id}
-                      actions={[<SettingOutlined onClick={editInstance} key="setting"/>]}>
+                      actions={[<SettingOutlined onClick={showEditInstance} key="setting"/>]}>
                     <Meta title={<b>{instance.name}</b>}/>
                     <div style={{marginTop: "1%"}}>
                         <h4><b>{instance.createdAt}</b></h4>

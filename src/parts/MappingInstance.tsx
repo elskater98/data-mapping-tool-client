@@ -124,7 +124,7 @@ const MappingInstance = (props: any) => {
             <Row>
                 <Col>
                     <Button onClick={back}>Back</Button>
-                    <Button style={{marginLeft: "1vh"}} onClick={submit}>Submit</Button>
+                    <Button type={"primary"} style={{marginLeft: "1vh"}} onClick={submit}>Submit</Button>
                 </Col>
             </Row>
         </>

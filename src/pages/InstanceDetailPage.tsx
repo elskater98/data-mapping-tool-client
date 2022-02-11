@@ -25,7 +25,6 @@ const InstanceDetailPage = () => {
     const [loading, setLoading] = useState(false);
     const [visibleClasses, setVisibleClasses] = useState(false);
     const [visibleEditInstance, setVisibleEditInstance] = useState(false);
-    const [files, setFiles] = useState<any>([]);
 
     const [classesForm] = useForm();
     const [editForm] = useForm();
@@ -41,11 +40,6 @@ const InstanceDetailPage = () => {
         setLoading(true)
         instanceService.getInstance(params.id).then((res) => {
             setInstance(res.data.data)
-
-            setFiles(res.data.data.filenames.map((i: string, index: number) => {
-                return {name: i, uid: i.toString(), status: 'done'}
-
-            }))
             setLoading(false);
         }).catch((err) => {
             message.error(err.toString())
@@ -108,7 +102,7 @@ const InstanceDetailPage = () => {
     }
 
     const onFinishEditInstance = () => {
-        window.location.reload()
+        console.log(editForm.getFieldsValue())
     }
 
     const onChangeDragger = (info: any) => {
@@ -167,28 +161,12 @@ const InstanceDetailPage = () => {
                         <Form.Item name={"name"} label={"Name"} rules={[{required: true}]}>
                             <Input placeholder={"Instance Name"}/>
                         </Form.Item>
-                        <Form.Item name={"description"} label={"Description"}>
-                            <Input.TextArea showCount maxLength={280}/>
-                        </Form.Item>
+
                     </Col>
                     <Col span={2}/>
                     <Col span={10}>
-                        <Form.Item name={"upload_file"} label={"Upload Data"} rules={[{required: true}]}>
-                            <Dragger accept={".json,.csv"}
-                                     defaultFileList={files}
-                                     action={configService.api_url + "/files/upload"}
-                                     headers={{Authorization: "Bearer " + authService.hasCredentials()}}
-                                     onChange={onChangeDragger}>
-                                <p className="ant-upload-drag-icon">
-                                    <InboxOutlined/>
-                                </p>
-                                <p className="ant-upload-text">Click or drag file to this area to upload</p>
-                                <p className="ant-upload-hint">
-                                    Support for a single or bulk upload. Strictly prohibit from uploading company
-                                    data or other
-                                    band files.
-                                </p>
-                            </Dragger>
+                        <Form.Item name={"description"} label={"Description"}>
+                            <Input.TextArea showCount maxLength={280}/>
                         </Form.Item>
                     </Col>
                 </Row>

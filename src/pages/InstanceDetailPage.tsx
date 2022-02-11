@@ -102,7 +102,13 @@ const InstanceDetailPage = () => {
     }
 
     const onFinishEditInstance = () => {
-        console.log(editForm.getFieldsValue())
+        instanceService.editInstances(params.id, editForm.getFieldsValue()).then((res) => {
+            getInstanceInfo();
+            closeEditInstance();
+            message.success(res.data.successful);
+        }).catch((err) => {
+            message.error(err.toString())
+        })
     }
 
     const onChangeDragger = (info: any) => {

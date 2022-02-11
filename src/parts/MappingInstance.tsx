@@ -64,7 +64,7 @@ const MappingInstance = (props: any) => {
         let newInstance = instance;
         newInstance.mapping[_class].columns = mapping
         newInstance.mapping[_class].fileSelected = selectedFile
-        instanceService.editInstances(ref, newInstance).catch((err) => {
+        instanceService.editInstances(ref, {mapping: newInstance.mapping}).catch((err) => {
             message.error(err.toString())
         })
         navigate(-1);
@@ -74,14 +74,11 @@ const MappingInstance = (props: any) => {
         setMapping({...mapping, ...mapping[ontology_value.name], [ontology_value.name]: selectedValue});
     }
 
-    const resetFields = () => {
-
-    }
 
     const onChangeSelectFile = (value: string) => {
         setSelectedFile(value);
         getSample(value);
-        resetFields();
+        setMapping({}) // reset select
     }
 
     useEffect(() => {

@@ -199,7 +199,7 @@ const InstanceDetailPage = () => {
             <Col span={10}>
                 <Card loading={loading} title={"Ref.: " + params.id}
                       actions={[<SettingOutlined onClick={showEditInstance} key="setting"/>]}>
-                    <Meta title={<b>{instance.name}</b>}/>
+                    <Meta title={<b>{instance.name}</b>} description={instance.description}/>
                     <div style={{marginTop: "1%"}}>
                         <h4><b>{instance.createdAt}</b></h4>
                         <h4>Created By: <b>{instance.createdBy}</b></h4>

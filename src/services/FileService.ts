@@ -14,7 +14,7 @@ class FileService {
             'Authorization': 'Bearer ' + this.authService.hasCredentials()
         };
 
-        return axios.get(this.configService.getConfig().api_url + '/files/download/' + filename, {headers: headers});
+        return axios.get(this.configService.getConfig().api_url + '/files/download/' + filename, {headers: headers,responseType:'blob'});
 
     }
 

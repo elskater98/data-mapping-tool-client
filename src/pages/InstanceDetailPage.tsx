@@ -1,13 +1,22 @@
 import {useNavigate, useParams} from "react-router-dom";
 import React, {useEffect, useState} from "react";
 import OntologyService from "../services/OntologyService";
-import {Button, Card, Col, Form, Input, message, Modal, Progress, Row, Select, Table, Tag, Upload} from "antd";
+import {Button, Card, Col, Form, Input, message, Modal, Progress, Row, Select, Table, Tag, Tooltip, Upload} from "antd";
 import InstanceService from "../services/InstanceService";
-import {AppstoreAddOutlined, DownOutlined, SettingOutlined} from '@ant-design/icons';
+import {
+    AppstoreAddOutlined,
+    DownOutlined,
+    SettingOutlined,
+    CloudUploadOutlined,
+    CloudDownloadOutlined
+} from '@ant-design/icons';
 import {useForm} from "antd/lib/form/Form";
 import {alphabeticalSort} from "../utils/sorter";
 import ConfigService from "../services/ConfigService";
 import AuthService from "../services/AuthService";
+import fileService from "../services/FileService";
+import FileService from "../services/FileService";
+import fileDownload from 'js-file-download';
 
 const {Column} = Table;
 const {Meta} = Card;
@@ -18,6 +27,7 @@ const InstanceDetailPage = () => {
 
     const ontologyService = new OntologyService();
     const instanceService = new InstanceService();
+    const fileService = new FileService();
     const configService = new ConfigService().getConfig()
     const authService = new AuthService()
 
@@ -133,6 +143,16 @@ const InstanceDetailPage = () => {
         }
     }
 
+    const downloadFiles = () => {
+        instance.filenames.map((i: string) => {
+            fileService.download(i).then((res) => {
+                fileDownload(res.data, i)
+            }).catch((err) => {
+                message.error(err.toString())
+            })
+        })
+    }
+
     // Mapping
 
 
@@ -190,9 +210,10 @@ const InstanceDetailPage = () => {
             </Form>
         </Modal>
 
+        {/* Content */}
         <Row>
             <Col span={1}/>
-            <Col span={10} style={{scrollBehavior: "smooth", overflow: "auto", height: "75vh"}}>
+            <Col span={10}>
                 <Table bordered={true} size={"middle"} dataSource={instance.classes_to_map}>
                     <Column width={"80vh"} title={"Class"}
                             sortDirections={['descend', 'ascend']}
@@ -209,7 +230,14 @@ const InstanceDetailPage = () => {
             </Col>
             <Col span={10}>
                 <Card loading={!instance} title={"Ref.: " + params.id}
-                      actions={[<SettingOutlined onClick={showEditInstance} key="setting"/>]}>
+                      actions={[
+                          <Tooltip title={"Edit"} placement={"bottom"}><SettingOutlined onClick={showEditInstance}
+                                                                                        key="setting"/></Tooltip>,
+                          <Tooltip title={"Upload"} placement={"bottom"}><CloudUploadOutlined
+                              key={"upload"}/></Tooltip>,
+                          <Tooltip title={"Download"} placement={"bottom"}><CloudDownloadOutlined
+                              onClick={downloadFiles}
+                              key={"download"}/></Tooltip>]}>
                     <Meta title={<b>{instance.name}</b>} description={instance.description}/>
                     <div style={{marginTop: "1%"}}>
                         <h4><b>{instance.createdAt}</b></h4>

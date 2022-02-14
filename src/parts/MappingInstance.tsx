@@ -1,10 +1,10 @@
 import {useLocation, useNavigate} from "react-router-dom";
-import {Button, Col, message, Popconfirm, Row, Select, Space, Steps, Table} from "antd";
+import {Button, Col, message, Modal, Popconfirm, Row, Select, Space, Steps, Table} from "antd";
 import React, {useEffect, useState} from "react";
 import InstanceService from "../services/InstanceService";
 import FileService from "../services/FileService";
 import OntologyService from "../services/OntologyService";
-import {LockOutlined, UnlockOutlined, QuestionCircleOutlined} from "@ant-design/icons";
+import {LockOutlined, UnlockOutlined, QuestionCircleOutlined, TableOutlined} from "@ant-design/icons";
 
 const {Column} = Table;
 
@@ -21,16 +21,20 @@ const MappingInstance = (props: any) => {
     const fileService = new FileService();
 
     const [columns, setColumns] = useState<any>([])
+    const [sample, setSample] = useState<any>([])
     const [instance, setInstance] = useState<any>({})
     const [properties, setProperties] = useState<any>([])
     const [mapping, setMapping] = useState<any>({})
     const [lock, setLock] = useState(true);
 
+    const [sampleVisible, setSampleVisible] = useState(false);
+
 
     const getSample = (filename: string) => {
         fileService.sample(filename).then((res) => {
+            setSample(res.data.sample)
             setColumns(res.data.columns.map((i: any) => {
-                return {value: i, label: i}
+                return {value: i, label: i, dataIndex: i, key: i, title: i}
             }))
         }).catch((err) => {
             message.error(err.toString())
@@ -87,10 +91,24 @@ const MappingInstance = (props: any) => {
         getInstance()
     }, [])
 
+    // Modal
+    const openSampleModal = () => {
+        setSampleVisible(true);
+    }
+
+    const closeSampleModal = () => {
+        setSampleVisible(false);
+    }
+
     return (
         <>
+            <Modal width={"200vh"} title={current_file} visible={sampleVisible} footer={null}
+                   onCancel={closeSampleModal}>
+                <Table scroll={{x: 500}} size={"small"} bordered={true} dataSource={sample} columns={columns}/>
+            </Modal>
+
             <Row style={{marginBottom: "3vh"}}>
-                <Col span={24}>
+                <Col span={22}>
                     <Select disabled={lock} style={{width: "50vh"}} options={files} loading={files.length === 0}
                             value={selectedFile}
                             onChange={(value: string) => onChangeSelectFile(value)}/>
@@ -101,6 +119,10 @@ const MappingInstance = (props: any) => {
                                 icon={<QuestionCircleOutlined style={{color: 'red'}}/>}>
                         <Button type={"text"} icon={lock ? <LockOutlined/> : <UnlockOutlined/>}/>
                     </Popconfirm>
+                </Col>
+                <Col span={1}/>
+                <Col span={1}>
+                    <Button shape={"circle"} icon={<TableOutlined/>} onClick={openSampleModal}/>
                 </Col>
             </Row>
 

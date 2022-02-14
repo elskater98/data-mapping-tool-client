@@ -1,9 +1,9 @@
 import {useNavigate, useParams} from "react-router-dom";
 import React, {useEffect, useState} from "react";
 import OntologyService from "../services/OntologyService";
-import {Button, Card, Col, Form, Input, List, message, Modal, Progress, Row, Select, Table, Tag, Upload} from "antd";
+import {Button, Card, Col, Form, Input, message, Modal, Progress, Row, Select, Table, Tag, Upload} from "antd";
 import InstanceService from "../services/InstanceService";
-import {DownOutlined, AppstoreAddOutlined, SettingOutlined, InboxOutlined} from '@ant-design/icons';
+import {AppstoreAddOutlined, DownOutlined, SettingOutlined} from '@ant-design/icons';
 import {useForm} from "antd/lib/form/Form";
 import {alphabeticalSort} from "../utils/sorter";
 import ConfigService from "../services/ConfigService";
@@ -12,6 +12,7 @@ import AuthService from "../services/AuthService";
 const {Column} = Table;
 const {Meta} = Card;
 const {Dragger} = Upload;
+
 const InstanceDetailPage = () => {
     const params = useParams();
 
@@ -22,7 +23,6 @@ const InstanceDetailPage = () => {
 
     const [classes, setClasses] = useState<any>([]);
     const [instance, setInstance] = useState<any>({});
-    const [loading, setLoading] = useState(false);
     const [visibleClasses, setVisibleClasses] = useState(false);
     const [visibleEditInstance, setVisibleEditInstance] = useState(false);
 
@@ -37,13 +37,10 @@ const InstanceDetailPage = () => {
     }, []);
 
     const getInstanceInfo = () => {
-        setLoading(true)
         instanceService.getInstance(params.id).then((res) => {
             setInstance(res.data.data)
-            setLoading(false);
         }).catch((err) => {
             message.error(err.toString())
-            setLoading(false);
         })
     }
 
@@ -98,12 +95,12 @@ const InstanceDetailPage = () => {
 
     const closeEditInstance = () => {
         setVisibleEditInstance(false);
-        editForm.resetFields()
     }
 
     const onFinishEditInstance = () => {
         instanceService.editInstances(params.id, editForm.getFieldsValue()).then((res) => {
-            getInstanceInfo();
+            setInstance({...instance, name: editForm.getFieldValue('name')})
+            setInstance({...instance, description: editForm.getFieldValue('description')})
             closeEditInstance();
             message.success(res.data.successful);
         }).catch((err) => {
@@ -118,6 +115,21 @@ const InstanceDetailPage = () => {
         }
         if (status === 'error') {
             message.error(`${info.file.name} file upload failed.`, 2);
+        }
+    }
+
+    // File
+    const removeFile = (item: any) => {
+        let filename_list = instance.filenames;
+        const index = filename_list.indexOf(item);
+
+        // Local Changes
+        if (index >= 0 && filename_list.length > 1) {
+            filename_list.splice(index, 1);
+            setInstance({...instance, filenames: filename_list})
+            instanceService.editInstances(params.id, {filenames: filename_list}).catch((err) => {
+                message.error(err.data().error)
+            })
         }
     }
 
@@ -136,7 +148,6 @@ const InstanceDetailPage = () => {
             }
         });
     }
-
 
     return (<>
         {/* Classes Modal */}
@@ -197,16 +208,18 @@ const InstanceDetailPage = () => {
                 <Button type={"primary"} shape="circle" icon={<DownOutlined/>} onClick={showClasses}/>
             </Col>
             <Col span={10}>
-                <Card loading={loading} title={"Ref.: " + params.id}
+                <Card loading={!instance} title={"Ref.: " + params.id}
                       actions={[<SettingOutlined onClick={showEditInstance} key="setting"/>]}>
                     <Meta title={<b>{instance.name}</b>} description={instance.description}/>
                     <div style={{marginTop: "1%"}}>
                         <h4><b>{instance.createdAt}</b></h4>
                         <h4>Created By: <b>{instance.createdBy}</b></h4>
                         <Progress percent={instance.status} strokeColor="#52c41a"/>
-                        <Card style={{marginTop: "1%"}} loading={loading}>
+                        <Card style={{marginTop: "1%"}} loading={!instance}>
                             {instance.filenames?.map((i: any) => {
-                                return <Tag key={i} color={"blue"}>{i}</Tag>
+                                return <Tag closable={instance.filenames.length > 1} onClose={() => {
+                                    removeFile(i)
+                                }} key={i} color={"blue"}>{i}</Tag>
                             })}
                         </Card>
                     </div>

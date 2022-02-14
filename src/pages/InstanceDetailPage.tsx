@@ -8,7 +8,7 @@ import {
     DownOutlined,
     SettingOutlined,
     CloudUploadOutlined,
-    CloudDownloadOutlined, InboxOutlined
+    CloudDownloadOutlined, InboxOutlined, UnlockOutlined, LockOutlined
 } from '@ant-design/icons';
 import {useForm} from "antd/lib/form/Form";
 import {alphabeticalSort} from "../utils/sorter";
@@ -36,6 +36,8 @@ const InstanceDetailPage = () => {
     const [visibleClasses, setVisibleClasses] = useState(false);
     const [visibleEditInstance, setVisibleEditInstance] = useState(false);
     const [visibleUpload, setVisibleUpload] = useState(false);
+
+    const [lock, setLock] = useState(true);
 
     const [classesForm] = useForm();
     const [editForm] = useForm();
@@ -293,13 +295,25 @@ const InstanceDetailPage = () => {
                         <h4><b>{instance.createdAt}</b></h4>
                         <h4>Created By: <b>{instance.createdBy}</b></h4>
                         <Progress percent={instance.status} strokeColor="#52c41a"/>
-                        <Card style={{marginTop: "1%"}} loading={!instance}>
-                            {instance.filenames?.map((i: any) => {
-                                return <Tag closable={instance.filenames.length > 1} onClose={() => {
-                                    removeFile(i)
-                                }} key={i} color={"blue"}>{i}</Tag>
-                            })}
-                        </Card>
+
+                        <Row justify={"center"} gutter={10} style={{alignItems: "center"}}>
+                            <Col span={23}>
+                                <Card style={{marginTop: "1%"}} loading={!instance}>
+                                    {instance.filenames?.map((i: any) => {
+                                        return <Tag closable={instance.filenames.length > 1 && !lock} onClose={() => {
+                                            removeFile(i)
+                                        }} key={i} color={"blue"}>{i}</Tag>
+                                    })}
+                                </Card>
+                            </Col>
+                            <Col span={1}>
+                                <Button type={"text"} icon={lock ? <LockOutlined/> : <UnlockOutlined/>} onClick={() => {
+                                    setLock(!lock)
+                                }}/>
+                            </Col>
+                        </Row>
+
+
                     </div>
                 </Card>
             </Col>

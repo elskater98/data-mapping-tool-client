@@ -8,7 +8,7 @@ import {
     DownOutlined,
     SettingOutlined,
     CloudUploadOutlined,
-    CloudDownloadOutlined
+    CloudDownloadOutlined, InboxOutlined
 } from '@ant-design/icons';
 import {useForm} from "antd/lib/form/Form";
 import {alphabeticalSort} from "../utils/sorter";
@@ -35,9 +35,11 @@ const InstanceDetailPage = () => {
     const [instance, setInstance] = useState<any>({});
     const [visibleClasses, setVisibleClasses] = useState(false);
     const [visibleEditInstance, setVisibleEditInstance] = useState(false);
+    const [visibleUpload, setVisibleUpload] = useState(false);
 
     const [classesForm] = useForm();
     const [editForm] = useForm();
+    const [uploadForm] = useForm();
 
     const navigate = useNavigate();
 
@@ -109,9 +111,8 @@ const InstanceDetailPage = () => {
 
     const onFinishEditInstance = () => {
         instanceService.editInstances(params.id, editForm.getFieldsValue()).then((res) => {
-            setInstance({...instance, name: editForm.getFieldValue('name')})
-            setInstance({...instance, description: editForm.getFieldValue('description')})
             closeEditInstance();
+            getInstanceInfo();
             message.success(res.data.successful);
         }).catch((err) => {
             message.error(err.toString())
@@ -126,6 +127,28 @@ const InstanceDetailPage = () => {
         if (status === 'error') {
             message.error(`${info.file.name} file upload failed.`, 2);
         }
+    }
+
+    // Upload Modal
+
+    const closeUploadModal = () => {
+        setVisibleUpload(false);
+        uploadForm.resetFields();
+    }
+
+    const onFinishUpload = () => {
+        const filenames = uploadForm.getFieldValue('filenames').fileList.map((file: any) => {
+            return file.name
+        })
+
+        let aux_files = Array.from(new Set(instance.filenames.concat(filenames)));
+
+        setInstance({...instance, filenames: aux_files});
+        instanceService.editInstances(params.id, {filenames: aux_files}).then((res) => {
+            message.success(res.data.successful)
+        }).catch(err => message.error(err.toString()))
+        closeUploadModal()
+
     }
 
     // File
@@ -210,6 +233,32 @@ const InstanceDetailPage = () => {
             </Form>
         </Modal>
 
+        <Modal width={"80vh"} visible={visibleUpload}
+               onCancel={closeUploadModal}
+               onOk={uploadForm.submit}>
+            <Form form={uploadForm} layout={"vertical"} onFinish={onFinishUpload}>
+                <Form.Item name={"filenames"}>
+                    <Dragger
+                        style={{marginTop: "2vh"}}
+                        accept={".json,.csv"}
+                        action={configService.api_url + "/files/upload"}
+                        headers={{Authorization: "Bearer " + authService.hasCredentials()}}
+                        onChange={onChangeDragger}>
+                        <p className="ant-upload-drag-icon">
+                            <InboxOutlined/>
+                        </p>
+                        <p className="ant-upload-text">Click or drag file to this area to upload</p>
+                        <p className="ant-upload-hint">
+                            Support for a single or bulk upload. Strictly prohibit from uploading company
+                            data or other
+                            band files.
+                        </p>
+                    </Dragger>
+                </Form.Item>
+            </Form>
+
+        </Modal>
+
         {/* Content */}
         <Row>
             <Col span={1}/>
@@ -233,8 +282,9 @@ const InstanceDetailPage = () => {
                       actions={[
                           <Tooltip title={"Edit"} placement={"bottom"}><SettingOutlined onClick={showEditInstance}
                                                                                         key="setting"/></Tooltip>,
-                          <Tooltip title={"Upload"} placement={"bottom"}><CloudUploadOutlined
-                              key={"upload"}/></Tooltip>,
+                          <Tooltip title={"Upload"} placement={"bottom"}><CloudUploadOutlined onClick={() => {
+                              setVisibleUpload(true)
+                          }} key={"upload"}/></Tooltip>,
                           <Tooltip title={"Download"} placement={"bottom"}><CloudDownloadOutlined
                               onClick={downloadFiles}
                               key={"download"}/></Tooltip>]}>

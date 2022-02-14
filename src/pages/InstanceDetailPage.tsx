@@ -5,16 +5,18 @@ import {Button, Card, Col, Form, Input, message, Modal, Progress, Row, Select, T
 import InstanceService from "../services/InstanceService";
 import {
     AppstoreAddOutlined,
-    DownOutlined,
-    SettingOutlined,
+    CloudDownloadOutlined,
     CloudUploadOutlined,
-    CloudDownloadOutlined, InboxOutlined, UnlockOutlined, LockOutlined
+    DownOutlined,
+    InboxOutlined,
+    LockOutlined,
+    SettingOutlined,
+    UnlockOutlined
 } from '@ant-design/icons';
 import {useForm} from "antd/lib/form/Form";
 import {alphabeticalSort} from "../utils/sorter";
 import ConfigService from "../services/ConfigService";
 import AuthService from "../services/AuthService";
-import fileService from "../services/FileService";
 import FileService from "../services/FileService";
 import fileDownload from 'js-file-download';
 
@@ -312,8 +314,6 @@ const InstanceDetailPage = () => {
                                 }}/>
                             </Col>
                         </Row>
-
-
                     </div>
                 </Card>
             </Col>

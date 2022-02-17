@@ -188,6 +188,7 @@ const InstanceDetailPage = () => {
             state: {
                 ref: params.id,
                 _class: _class,
+                subject: instance.mapping[_class].subject,
                 current_file: instance.mapping[_class].fileSelected,
                 files: instance.filenames.map((i: any) => {
                     return {value: i, label: i}

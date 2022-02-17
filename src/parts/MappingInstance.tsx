@@ -1,5 +1,5 @@
 import {useLocation, useNavigate} from "react-router-dom";
-import {Button, Col, message, Modal, Popconfirm, Row, Select, Space, Steps, Table} from "antd";
+import {Button, Col, Divider, Form, Input, message, Modal, Popconfirm, Row, Select, Space, Steps, Table} from "antd";
 import React, {useEffect, useState} from "react";
 import InstanceService from "../services/InstanceService";
 import FileService from "../services/FileService";
@@ -12,10 +12,9 @@ const MappingInstance = (props: any) => {
 
     const {state} = useLocation();
     const navigate = useNavigate()
-    const {ref, _class, files, current_file}: any = state;
+    const {ref, _class, files, current_file, subject}: any = state;
 
     const [selectedFile, setSelectedFile] = useState(current_file);
-
     const instanceService = new InstanceService();
     const ontologyService = new OntologyService();
     const fileService = new FileService();
@@ -26,6 +25,7 @@ const MappingInstance = (props: any) => {
     const [properties, setProperties] = useState<any>([])
     const [mapping, setMapping] = useState<any>({})
     const [lock, setLock] = useState(true);
+    const [form] = Form.useForm();
 
     const [sampleVisible, setSampleVisible] = useState(false);
 
@@ -68,6 +68,7 @@ const MappingInstance = (props: any) => {
         let newInstance = instance;
         newInstance.mapping[_class].columns = mapping
         newInstance.mapping[_class].fileSelected = selectedFile
+        newInstance.mapping[_class].subject = form.getFieldValue('subject');
         instanceService.editInstances(ref, {mapping: newInstance.mapping}).catch((err) => {
             message.error(err.toString())
         })
@@ -125,14 +126,28 @@ const MappingInstance = (props: any) => {
                     <Button shape={"circle"} icon={<TableOutlined/>} onClick={openSampleModal}/>
                 </Col>
             </Row>
-
+            <Divider/>
+            <Row>
+                <Col span={10}>
+                    <Form layout={"vertical"} form={form} onFinish={submit} initialValues={{subject: subject}}>
+                        <Form.Item name={"subject"} label={"Subject"} rules={[{required: true}]}>
+                            <Select showSearch style={{width: "50vh"}} options={columns}
+                                    placeholder={"Select Subject"}
+                            />
+                        </Form.Item>
+                    </Form>
+                </Col>
+            </Row>
+            <Divider/>
             <Row>
                 <Col span={24}>
+                    <h4><b>Mapping:</b></h4>
                     <Table bordered={true} loading={properties.length === 0} dataSource={properties}>
-                        <Column title={"Property"} dataIndex={"value"}/>
-                        <Column title={"Column"} render={(ontology_value, record, index) => {
+                        <Column title={"Properties"} dataIndex={"value"}/>
+                        <Column title={"Data set column"} render={(ontology_value, record, index) => {
                             return (<>
-                                <Select mode={"multiple"} style={{width: "50vh"}}
+                                <Select style={{width: "50vh"}}
+                                        showSearch
                                         loading={columns.length === 0}
                                         value={mapping[ontology_value.name]}
                                         options={columns} onChange={(selectedValue, option) => {
@@ -146,7 +161,7 @@ const MappingInstance = (props: any) => {
             <Row>
                 <Col>
                     <Button onClick={back}>Back</Button>
-                    <Button type={"primary"} style={{marginLeft: "1vh"}} onClick={submit}>Submit</Button>
+                    <Button type={"primary"} style={{marginLeft: "1vh"}} onClick={form.submit}>Submit</Button>
                 </Col>
             </Row>
         </>

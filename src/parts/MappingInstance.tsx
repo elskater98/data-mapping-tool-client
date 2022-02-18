@@ -12,7 +12,9 @@ const MappingInstance = (props: any) => {
 
     const {state} = useLocation();
     const navigate = useNavigate()
-    const {ref, _class, files, current_file, subject}: any = state;
+    const {ref, _class, files, current_file}: any = state;
+
+    const [subject, setSubject] = useState<any>(null);
 
     const [selectedFile, setSelectedFile] = useState(current_file);
     const instanceService = new InstanceService();
@@ -25,7 +27,6 @@ const MappingInstance = (props: any) => {
     const [properties, setProperties] = useState<any>([])
     const [mapping, setMapping] = useState<any>({})
     const [lock, setLock] = useState(true);
-    const [form] = Form.useForm();
 
     const [sampleVisible, setSampleVisible] = useState(false);
 
@@ -46,6 +47,7 @@ const MappingInstance = (props: any) => {
         instanceService.getInstance(ref).then((res) => {
             setInstance(res.data.data);
             setMapping(res.data.data.mapping[_class].columns);
+            setSubject(res.data.data.mapping[_class].subject);
         }).catch((err) => {
             message.error(err.toString());
         })
@@ -68,7 +70,7 @@ const MappingInstance = (props: any) => {
         let newInstance = instance;
         newInstance.mapping[_class].columns = mapping
         newInstance.mapping[_class].fileSelected = selectedFile
-        newInstance.mapping[_class].subject = form.getFieldValue('subject');
+        newInstance.mapping[_class].subject = subject;
         instanceService.editInstances(ref, {mapping: newInstance.mapping}).catch((err) => {
             message.error(err.toString())
         })
@@ -83,6 +85,7 @@ const MappingInstance = (props: any) => {
     const onChangeSelectFile = (value: string) => {
         setSelectedFile(value);
         getSample(value);
+        setSubject(null); // reset subject
         setMapping({}) // reset select
     }
 
@@ -129,13 +132,10 @@ const MappingInstance = (props: any) => {
             <Divider/>
             <Row>
                 <Col span={10}>
-                    <Form layout={"vertical"} form={form} onFinish={submit} initialValues={{subject: subject}}>
-                        <Form.Item name={"subject"} label={"Subject"} rules={[{required: true}]}>
-                            <Select showSearch style={{width: "50vh"}} options={columns}
-                                    placeholder={"Select Subject"}
-                            />
-                        </Form.Item>
-                    </Form>
+                    <h4><b>Subject:</b></h4>
+                    <Select showSearch style={{width: "50vh"}} options={columns}
+                            placeholder={"Select Subject"} value={subject} onChange={setSubject}/>
+
                 </Col>
             </Row>
             <Divider/>
@@ -161,7 +161,8 @@ const MappingInstance = (props: any) => {
             <Row>
                 <Col>
                     <Button onClick={back}>Back</Button>
-                    <Button type={"primary"} style={{marginLeft: "1vh"}} onClick={form.submit}>Submit</Button>
+                    <Button disabled={!subject} type={"primary"} style={{marginLeft: "1vh"}}
+                            onClick={submit}>Submit</Button>
                 </Col>
             </Row>
         </>

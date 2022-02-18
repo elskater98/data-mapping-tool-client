@@ -85,7 +85,7 @@ const InstanceDetailPage = () => {
         setInstance({...instance, classes_to_map: values});
 
         let aux_map: any = instance.mapping;
-        if (Object.keys(instance.mapping).length == 0) {
+        if (Object.keys(instance.mapping).length === 0) {
             for (let i of classes) {
                 aux_map[i.label] = {status: false, fileSelected: instance.filenames[0], columns: {}}
             }
@@ -152,7 +152,6 @@ const InstanceDetailPage = () => {
             message.success(res.data.successful)
         }).catch(err => message.error(err.toString()))
         closeUploadModal()
-
     }
 
     // File

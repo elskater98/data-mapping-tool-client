@@ -1,14 +1,33 @@
 import {useNavigate, useParams} from "react-router-dom";
 import React, {useEffect, useState} from "react";
 import OntologyService from "../services/OntologyService";
-import {Button, Card, Col, Form, Input, message, Modal, Progress, Row, Select, Table, Tag, Tooltip, Upload} from "antd";
+import {
+    Button,
+    Card,
+    Col,
+    Divider,
+    Form,
+    Input,
+    message,
+    Modal,
+    Progress,
+    Row,
+    Select,
+    Space,
+    Table,
+    Tag,
+    Tooltip,
+    Upload
+} from "antd";
 import InstanceService from "../services/InstanceService";
 import {
     AppstoreAddOutlined,
+    CaretRightOutlined,
     CloudDownloadOutlined,
     CloudUploadOutlined,
     DownOutlined,
     InboxOutlined,
+    LinkOutlined,
     LockOutlined,
     SettingOutlined,
     UnlockOutlined
@@ -19,6 +38,7 @@ import ConfigService from "../services/ConfigService";
 import AuthService from "../services/AuthService";
 import FileService from "../services/FileService";
 import fileDownload from 'js-file-download';
+import MappingService from "../services/MappingService";
 
 const {Column} = Table;
 const {Meta} = Card;
@@ -30,6 +50,7 @@ const InstanceDetailPage = () => {
     const ontologyService = new OntologyService();
     const instanceService = new InstanceService();
     const fileService = new FileService();
+    const mappingService = new MappingService();
     const configService = new ConfigService().getConfig()
     const authService = new AuthService()
 
@@ -38,7 +59,8 @@ const InstanceDetailPage = () => {
     const [visibleClasses, setVisibleClasses] = useState(false);
     const [visibleEditInstance, setVisibleEditInstance] = useState(false);
     const [visibleUpload, setVisibleUpload] = useState(false);
-
+    const [generateConfig, setGenerateConfig] = useState<any>([]);
+    const [generateOptions, setGenerateOptions] = useState<any>([]);
     const [lock, setLock] = useState(true);
 
     const [classesForm] = useForm();
@@ -55,6 +77,13 @@ const InstanceDetailPage = () => {
     const getInstanceInfo = () => {
         instanceService.getInstance(params.id).then((res) => {
             setInstance(res.data.data)
+
+            // generate select init values
+            setGenerateConfig((res.data.data.classes_to_map))
+            setGenerateOptions(res.data.data.classes_to_map.map((i: string) => {
+                return {value: i, label: i}
+            }));
+
         }).catch((err) => {
             message.error(err.toString())
         })
@@ -82,6 +111,14 @@ const InstanceDetailPage = () => {
 
     const onFinishClasses = () => {
         let values = classesForm.getFieldValue('select');
+
+        // set new values
+        setGenerateConfig(values);
+        setGenerateOptions(values.map((i: string) => {
+            return {value: i, label: i}
+        }));
+
+        // mapping
         setInstance({...instance, classes_to_map: values});
 
         let aux_map: any = instance.mapping;
@@ -94,13 +131,18 @@ const InstanceDetailPage = () => {
 
         instanceService.editInstances(params.id, {
             classes_to_map: values,
-            mapping: aux_map
+            mapping: aux_map,
         }).then((res) => {
             setInstance({...instance, classes_to_map: values})
             closeClasses();
         }).catch((err) => {
             message.error(err.toString())
         })
+
+        // relations
+        ontologyService.getRelationsBetweenClasses({classes: values}).then((res) => {
+            instanceService.editInstances(params.id, {relations: res.data.relations}).catch((err) => message.error(err.toString()))
+        }).catch(err => message.error(err.toString()))
     }
 
     // Edit Instance Modal
@@ -196,6 +238,13 @@ const InstanceDetailPage = () => {
         });
     }
 
+    const generate = () => {
+        mappingService.generateYARRML({ref: params.id, classes: generateConfig}).then((res) => {
+            message.success("The YARRRML file has been generated successfully.")
+            fileDownload(res.data.yaml, "res.yml")
+        }).catch(err => message.error(err.toString()))
+    }
+
     return (<>
         {/* Classes Modal */}
         <Modal visible={visibleClasses} onCancel={closeClasses} onOk={classesForm.submit}>
@@ -272,8 +321,8 @@ const InstanceDetailPage = () => {
                             sortDirections={['descend', 'ascend']}
                             sorter={{compare: (a: any, b: any) => alphabeticalSort(a, b)}}/>
                     <Column align={"center"} title={"Actions"} render={(value, record, index) => {
-                        return <Button size={"small"} shape={"circle"} icon={<AppstoreAddOutlined/>}
-                                       onClick={() => startMapping(value)}/>
+                        return <Space><Button size={"small"} shape={"circle"} icon={<AppstoreAddOutlined/>}
+                                              onClick={() => startMapping(value)}/></Space>
                     }}/>
                 </Table>
 
@@ -315,6 +364,21 @@ const InstanceDetailPage = () => {
                             </Col>
                         </Row>
                     </div>
+                </Card>
+                <Divider/>
+                <Card title={"Generate YARRRML"} actions={[
+
+                    <Tooltip title={"Run"} placement={"bottom"}><CaretRightOutlined key="run" style={{color: "green"}}
+                                                                                    onClick={generate}/></Tooltip>]}>
+                    <Row>
+                        <Col span={24}>
+                            <Select mode={"multiple"} loading={!generateOptions} showSearch options={generateOptions}
+                                    style={{minWidth: "100%"}}
+                                    value={generateConfig} onChange={(value) => {
+                                setGenerateConfig(value)
+                            }}/>
+                        </Col>
+                    </Row>
                 </Card>
             </Col>
             <Col span={1}/>

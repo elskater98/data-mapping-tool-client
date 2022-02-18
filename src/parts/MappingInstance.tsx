@@ -142,7 +142,7 @@ const MappingInstance = (props: any) => {
             <Row>
                 <Col span={24}>
                     <h4><b>Mapping:</b></h4>
-                    <Table bordered={true} loading={properties.length === 0} dataSource={properties}>
+                    <Table bordered={true} pagination={{ defaultPageSize: 5}} loading={properties.length === 0} dataSource={properties}>
                         <Column title={"Properties"} dataIndex={"value"}/>
                         <Column title={"Data set column"} render={(ontology_value, record, index) => {
                             return (<>

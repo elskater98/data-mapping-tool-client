@@ -1,5 +1,5 @@
 import React, {Fragment, useEffect, useState} from "react";
-import {Button, Col, Form, Input, message, Modal, Popconfirm, Progress, Row, Table, Tooltip, Upload} from "antd";
+import {Button, Col, Form, Input, message, Modal, Popconfirm, Progress, Row, Space, Table, Tooltip, Upload} from "antd";
 import {
     DeleteOutlined,
     DownloadOutlined,
@@ -217,29 +217,26 @@ const MyInstancesPage = () => {
                         <Column align={"center"} title="Actions" fixed={"right"}
                                 render={(i) => (
                                     <Fragment>
-                                        <Row>
-                                            <Col span={5}>
-                                                <Tooltip title="Mapping">
-                                                    <Button shape="circle" icon={<BuildOutlined />} onClick={() => {
-                                                        mapping(i['ref']);
-                                                    }}/>
-                                                </Tooltip>
-                                            </Col>
-                                            <Col span={5}>
-                                                <Popconfirm title="Are you sure？" onConfirm={() => {
-                                                    deleteInstance(i['ref'])
-                                                }}
-                                                            icon={<QuestionCircleOutlined style={{color: 'red'}}/>}>
-                                                    <a href="#"><Button shape="circle" icon={<DeleteOutlined/>}/></a>
-                                                </Popconfirm>
-                                            </Col>
-                                            <Col span={5}>
-                                                <Tooltip title="Download">
-                                                    <Button shape="circle" icon={<DownloadOutlined/>} onClick={() => {
-                                                    }}/>
-                                                </Tooltip>
-                                            </Col>
-                                        </Row>
+                                        <Space size={"large"}>
+
+                                            <Tooltip title="Mapping">
+                                                <Button shape="circle" icon={<BuildOutlined/>} onClick={() => {
+                                                    mapping(i['ref']);
+                                                }}/>
+                                            </Tooltip>
+
+                                            <Popconfirm title="Are you sure？" onConfirm={() => {
+                                                deleteInstance(i['ref'])
+                                            }}
+                                                        icon={<QuestionCircleOutlined style={{color: 'red'}}/>}>
+                                                <a href="#"><Button shape="circle" icon={<DeleteOutlined/>}/></a>
+                                            </Popconfirm>
+
+                                            <Tooltip title="Download">
+                                                <Button shape="circle" icon={<DownloadOutlined/>} onClick={() => {
+                                                }}/>
+                                            </Tooltip>
+                                        </Space>
                                     </Fragment>)}/>
                     </Table>
                 </Col>

@@ -1,34 +1,91 @@
 import {useNavigate, useParams} from "react-router-dom";
 import React, {useEffect, useState} from "react";
 import OntologyService from "../services/OntologyService";
-import {Button, Card, Col, Form, List, message, Modal, Progress, Row, Select, Tag} from "antd";
+import {
+    Button,
+    Card,
+    Col,
+    Divider,
+    Form,
+    Input,
+    message,
+    Modal,
+    Progress,
+    Row,
+    Select,
+    Space,
+    Table,
+    Tag,
+    Tooltip,
+    Upload
+} from "antd";
 import InstanceService from "../services/InstanceService";
-import {DownOutlined, PlusOutlined, SettingOutlined} from '@ant-design/icons';
+import {
+    AppstoreAddOutlined,
+    CaretRightOutlined,
+    CloudDownloadOutlined,
+    CloudUploadOutlined,
+    DownOutlined,
+    InboxOutlined,
+    LinkOutlined,
+    LockOutlined,
+    SettingOutlined,
+    UnlockOutlined
+} from '@ant-design/icons';
 import {useForm} from "antd/lib/form/Form";
+import {alphabeticalSort} from "../utils/sorter";
+import ConfigService from "../services/ConfigService";
+import AuthService from "../services/AuthService";
+import FileService from "../services/FileService";
+import fileDownload from 'js-file-download';
+import MappingService from "../services/MappingService";
 
+const {Column} = Table;
 const {Meta} = Card;
+const {Dragger} = Upload;
+
 const InstanceDetailPage = () => {
     const params = useParams();
 
     const ontologyService = new OntologyService();
     const instanceService = new InstanceService();
+    const fileService = new FileService();
+    const mappingService = new MappingService();
+    const configService = new ConfigService().getConfig()
+    const authService = new AuthService()
 
     const [classes, setClasses] = useState<any>([]);
     const [instance, setInstance] = useState<any>({});
-    const [loading, setLoading] = useState(false);
-    const [visible, setVisible] = useState(false);
+    const [visibleClasses, setVisibleClasses] = useState(false);
+    const [visibleEditInstance, setVisibleEditInstance] = useState(false);
+    const [visibleUpload, setVisibleUpload] = useState(false);
+    const [generateConfig, setGenerateConfig] = useState<any>([]);
+    const [generateOptions, setGenerateOptions] = useState<any>([]);
+    const [lock, setLock] = useState(true);
 
-    const [form] = useForm();
+    const [classesForm] = useForm();
+    const [editForm] = useForm();
+    const [uploadForm] = useForm();
+
     const navigate = useNavigate();
 
+    useEffect(() => {
+        getInstanceInfo();
+        getClasses();
+    }, []);
+
     const getInstanceInfo = () => {
-        setLoading(true)
         instanceService.getInstance(params.id).then((res) => {
             setInstance(res.data.data)
-            setLoading(false);
+
+            // generate select init values
+            setGenerateConfig((res.data.data.classes_to_map))
+            setGenerateOptions(res.data.data.classes_to_map.map((i: string) => {
+                return {value: i, label: i}
+            }));
+
         }).catch((err) => {
             message.error(err.toString())
-            setLoading(false);
         })
     }
 
@@ -41,31 +98,31 @@ const InstanceDetailPage = () => {
         });
     }
 
-    const editInstance = () => {
-        console.log(params.id)
-        console.log(instance)
+    // Class Modal
+
+    const closeClasses = () => {
+        setVisibleClasses(false);
+        classesForm.resetFields();
     }
 
-    useEffect(() => {
-        getInstanceInfo();
-        getClasses();
-    }, []);
-
-    const closeModal = () => {
-        setVisible(false);
-        form.resetFields();
+    const showClasses = () => {
+        setVisibleClasses(true);
     }
 
-    const showModal = () => {
-        setVisible(true);
-    }
+    const onFinishClasses = () => {
+        let values = classesForm.getFieldValue('select');
 
-    const onFinish = () => {
-        let values = form.getFieldValue('select');
+        // set new values
+        setGenerateConfig(values);
+        setGenerateOptions(values.map((i: string) => {
+            return {value: i, label: i}
+        }));
+
+        // mapping
         setInstance({...instance, classes_to_map: values});
 
         let aux_map: any = instance.mapping;
-        if (Object.keys(instance.mapping).length == 0) {
+        if (Object.keys(instance.mapping).length === 0) {
             for (let i of classes) {
                 aux_map[i.label] = {status: false, fileSelected: instance.filenames[0], columns: {}}
             }
@@ -74,20 +131,105 @@ const InstanceDetailPage = () => {
 
         instanceService.editInstances(params.id, {
             classes_to_map: values,
-            mapping: aux_map
+            mapping: aux_map,
         }).then((res) => {
-            closeModal();
             setInstance({...instance, classes_to_map: values})
+            closeClasses();
+        }).catch((err) => {
+            message.error(err.toString())
+        })
+
+        // relations
+        ontologyService.getRelationsBetweenClasses({classes: values}).then((res) => {
+            instanceService.editInstances(params.id, {relations: res.data.relations}).catch((err) => message.error(err.toString()))
+        }).catch(err => message.error(err.toString()))
+    }
+
+    // Edit Instance Modal
+
+    const showEditInstance = () => {
+        setVisibleEditInstance(true);
+    }
+
+    const closeEditInstance = () => {
+        setVisibleEditInstance(false);
+    }
+
+    const onFinishEditInstance = () => {
+        instanceService.editInstances(params.id, editForm.getFieldsValue()).then((res) => {
+            closeEditInstance();
+            getInstanceInfo();
+            message.success(res.data.successful);
         }).catch((err) => {
             message.error(err.toString())
         })
     }
+
+    const onChangeDragger = (info: any) => {
+        const {status} = info.file;
+        if (status !== 'uploading') {
+            console.log(info.file, info.fileList);
+        }
+        if (status === 'error') {
+            message.error(`${info.file.name} file upload failed.`, 2);
+        }
+    }
+
+    // Upload Modal
+
+    const closeUploadModal = () => {
+        setVisibleUpload(false);
+        uploadForm.resetFields();
+    }
+
+    const onFinishUpload = () => {
+        const filenames = uploadForm.getFieldValue('filenames').fileList.map((file: any) => {
+            return file.name
+        })
+
+        let aux_files = Array.from(new Set(instance.filenames.concat(filenames)));
+
+        setInstance({...instance, filenames: aux_files});
+        instanceService.editInstances(params.id, {filenames: aux_files}).then((res) => {
+            message.success(res.data.successful)
+        }).catch(err => message.error(err.toString()))
+        closeUploadModal()
+    }
+
+    // File
+    const removeFile = (item: any) => {
+        let filename_list = instance.filenames;
+        const index = filename_list.indexOf(item);
+
+        // Local Changes
+        if (index >= 0 && filename_list.length > 1) {
+            filename_list.splice(index, 1);
+            setInstance({...instance, filenames: filename_list})
+            instanceService.editInstances(params.id, {filenames: filename_list}).catch((err) => {
+                message.error(err.data().error)
+            })
+        }
+    }
+
+    const downloadFiles = () => {
+        instance.filenames.map((i: string) => {
+            fileService.download(i).then((res) => {
+                fileDownload(res.data, i)
+            }).catch((err) => {
+                message.error(err.toString())
+            })
+        })
+    }
+
+    // Mapping
+
 
     const startMapping = (_class: string) => {
         navigate('mapping', {
             state: {
                 ref: params.id,
                 _class: _class,
+                subject: instance.mapping[_class].subject,
                 current_file: instance.mapping[_class].fileSelected,
                 files: instance.filenames.map((i: any) => {
                     return {value: i, label: i}
@@ -96,9 +238,17 @@ const InstanceDetailPage = () => {
         });
     }
 
+    const generate = () => {
+        mappingService.generateYARRML({ref: params.id, classes: generateConfig}).then((res) => {
+            message.success("The YARRRML file has been generated successfully.")
+            fileDownload(res.data.yaml, "res.yml")
+        }).catch(err => message.error(err.toString()))
+    }
+
     return (<>
-        <Modal visible={visible} onCancel={closeModal} onOk={form.submit}>
-            <Form layout={"vertical"} form={form} onFinish={onFinish}>
+        {/* Classes Modal */}
+        <Modal visible={visibleClasses} onCancel={closeClasses} onOk={classesForm.submit}>
+            <Form layout={"vertical"} form={classesForm} onFinish={onFinishClasses}>
                 <Form.Item name={"select"} label={"Classes"} rules={[{required: true}]}
                            initialValue={instance.classes_to_map}>
                     <Select mode="multiple" placeholder="Select the class/es that you would like to map."
@@ -107,46 +257,128 @@ const InstanceDetailPage = () => {
             </Form>
         </Modal>
 
+        {/* Edit Instance Modal */}
+
+        <Modal
+            width={"100vh"}
+            visible={visibleEditInstance}
+            title="Create Instance"
+            onCancel={closeEditInstance}
+            onOk={editForm.submit}>
+
+            <Form form={editForm} layout={"vertical"}
+                  initialValues={{name: instance.name, description: instance.description}}
+                  onFinish={onFinishEditInstance}>
+                <Row>
+                    <Col span={10}>
+                        <Form.Item name={"name"} label={"Name"} rules={[{required: true}]}>
+                            <Input placeholder={"Instance Name"}/>
+                        </Form.Item>
+
+                    </Col>
+                    <Col span={2}/>
+                    <Col span={10}>
+                        <Form.Item name={"description"} label={"Description"}>
+                            <Input.TextArea showCount maxLength={280}/>
+                        </Form.Item>
+                    </Col>
+                </Row>
+            </Form>
+        </Modal>
+
+        <Modal width={"80vh"} visible={visibleUpload}
+               onCancel={closeUploadModal}
+               onOk={uploadForm.submit}>
+            <Form form={uploadForm} layout={"vertical"} onFinish={onFinishUpload}>
+                <Form.Item name={"filenames"}>
+                    <Dragger
+                        style={{marginTop: "2vh"}}
+                        accept={".json,.csv"}
+                        action={configService.api_url + "/files/upload"}
+                        headers={{Authorization: "Bearer " + authService.hasCredentials()}}
+                        onChange={onChangeDragger}>
+                        <p className="ant-upload-drag-icon">
+                            <InboxOutlined/>
+                        </p>
+                        <p className="ant-upload-text">Click or drag file to this area to upload</p>
+                        <p className="ant-upload-hint">
+                            Support for a single or bulk upload. Strictly prohibit from uploading company
+                            data or other
+                            band files.
+                        </p>
+                    </Dragger>
+                </Form.Item>
+            </Form>
+
+        </Modal>
+
+        {/* Content */}
         <Row>
             <Col span={1}/>
-            <Col span={10} style={{scrollBehavior: "smooth", overflow: "auto", height: "75vh"}}>
-                <div style={{width: "50vh"}}>
-                    <List itemLayout={"vertical"}
-                          size={"small"}
-                          dataSource={instance.classes_to_map}
-                          renderItem={(item: any) => (
-                              <List.Item>
-                                  <Row>
-                                      <Col span={12}>{item}:</Col>
-                                      <Col span={12}>
-                                          <Button size={"small"} shape={"circle"} icon={<PlusOutlined/>}
-                                                  onClick={() => startMapping(item)}/>
-                                          {/*{instance.ref?.toString()}*/}
-                                      </Col>
-                                  </Row>
-                              </List.Item>)
-                          }>
-                    </List>
-                </div>
+            <Col span={10}>
+                <Table bordered={true} size={"middle"} dataSource={instance.classes_to_map}>
+                    <Column width={"80vh"} title={"Class"}
+                            sortDirections={['descend', 'ascend']}
+                            sorter={{compare: (a: any, b: any) => alphabeticalSort(a, b)}}/>
+                    <Column align={"center"} title={"Actions"} render={(value, record, index) => {
+                        return <Space><Button size={"small"} shape={"circle"} icon={<AppstoreAddOutlined/>}
+                                              onClick={() => startMapping(value)}/></Space>
+                    }}/>
+                </Table>
 
             </Col>
             <Col span={2} style={{paddingLeft: "2%"}}>
-                <Button type={"primary"} shape="circle" icon={<DownOutlined/>} onClick={showModal}/>
+                <Button type={"primary"} shape="circle" icon={<DownOutlined/>} onClick={showClasses}/>
             </Col>
             <Col span={10}>
-                <Card loading={loading} title={"Ref.: " + params.id}
-                      actions={[<SettingOutlined onClick={editInstance} key="setting"/>]}>
-                    <Meta title={<b>{instance.name}</b>}/>
+                <Card loading={!instance} title={"Ref.: " + params.id}
+                      actions={[
+                          <Tooltip title={"Edit"} placement={"bottom"}><SettingOutlined onClick={showEditInstance}
+                                                                                        key="setting"/></Tooltip>,
+                          <Tooltip title={"Upload"} placement={"bottom"}><CloudUploadOutlined onClick={() => {
+                              setVisibleUpload(true)
+                          }} key={"upload"}/></Tooltip>,
+                          <Tooltip title={"Download"} placement={"bottom"}><CloudDownloadOutlined
+                              onClick={downloadFiles}
+                              key={"download"}/></Tooltip>]}>
+                    <Meta title={<b>{instance.name}</b>} description={instance.description}/>
                     <div style={{marginTop: "1%"}}>
                         <h4><b>{instance.createdAt}</b></h4>
                         <h4>Created By: <b>{instance.createdBy}</b></h4>
                         <Progress percent={instance.status} strokeColor="#52c41a"/>
-                        <Card style={{marginTop: "1%"}} loading={loading}>
-                            {instance.filenames?.map((i: any) => {
-                                return <Tag key={i} color={"blue"}>{i}</Tag>
-                            })}
-                        </Card>
+
+                        <Row justify={"center"} gutter={10} style={{alignItems: "center"}}>
+                            <Col span={23}>
+                                <Card style={{marginTop: "1%"}} loading={!instance}>
+                                    {instance.filenames?.map((i: any) => {
+                                        return <Tag closable={instance.filenames.length > 1 && !lock} onClose={() => {
+                                            removeFile(i)
+                                        }} key={i} color={"blue"}>{i}</Tag>
+                                    })}
+                                </Card>
+                            </Col>
+                            <Col span={1}>
+                                <Button type={"text"} icon={lock ? <LockOutlined/> : <UnlockOutlined/>} onClick={() => {
+                                    setLock(!lock)
+                                }}/>
+                            </Col>
+                        </Row>
                     </div>
+                </Card>
+                <Divider/>
+                <Card title={"Generate YARRRML"} actions={[
+
+                    <Tooltip title={"Run"} placement={"bottom"}><CaretRightOutlined key="run" style={{color: "green"}}
+                                                                                    onClick={generate}/></Tooltip>]}>
+                    <Row>
+                        <Col span={24}>
+                            <Select mode={"multiple"} loading={!generateOptions} showSearch options={generateOptions}
+                                    style={{minWidth: "100%"}}
+                                    value={generateConfig} onChange={(value) => {
+                                setGenerateConfig(value)
+                            }}/>
+                        </Col>
+                    </Row>
                 </Card>
             </Col>
             <Col span={1}/>

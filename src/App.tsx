@@ -48,7 +48,7 @@ function App() {
                 </Header>
                 <Content className="site-layout" style={{padding: '0 50px', marginTop: 64}}>
                     <div className="site-layout-background"
-                         style={{margin: '25px 0', padding: 24, minHeight: 380, height: "85vh"}}>
+                         style={{margin: '25px 0', padding: 24, minHeight: 380, height: "80vh"}}>
                         <Routes>
                             <Route path="/" element={<ProtectedRoute
                                 roles={[Roles.User, Roles.Admin]}><HomaPage/></ProtectedRoute>}>

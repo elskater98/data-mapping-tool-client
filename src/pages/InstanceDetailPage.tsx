@@ -136,6 +136,7 @@ const InstanceDetailPage = () => {
             classes_to_map: values,
         }).then((res) => {
             setInstance(res.data.instance)
+            getRelations(res.data.instance)
             closeClasses();
         }).catch((err) => {
             message.error(err.toString())
@@ -345,7 +346,8 @@ const InstanceDetailPage = () => {
                     })
                     }/>
                     <Column title={"Actions"} align={"center"} render={(value) => {
-                        return <Space><Button disabled={!value.selected} size={"small"} shape={"circle"} icon={<LinkOutlined/>}/> </Space>
+                        return <Space><Button disabled={!value.selected} size={"small"} shape={"circle"}
+                                              icon={<LinkOutlined/>}/> </Space>
                     }}/>
                 </Table>
             </Col>

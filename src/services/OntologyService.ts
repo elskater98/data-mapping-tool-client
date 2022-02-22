@@ -41,6 +41,14 @@ class OntologyService {
         return axios.post(this.configService.getConfig().api_url + '/ontology/classes/relations', payload, {headers: headers})
     }
 
+    initInstance(ref: string) {
+        const headers = {
+            'Authorization': 'Bearer ' + this.authService.hasCredentials()
+        };
+
+        return axios.post(this.configService.getConfig().api_url + '/ontology/init/instance/' + ref, {}, {headers: headers})
+    }
+
 }
 
 export default OntologyService;

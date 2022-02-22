@@ -168,12 +168,9 @@ const MyInstancesPage = () => {
             <Row style={{marginTop: "3vh"}}>
                 <Col span={24}>
                     <Table size={"middle"} dataSource={dataSource}
+                           pagination={{defaultPageSize: 10, showSizeChanger: true, pageSizeOptions: [5, 10]}}
                            bordered={true}
-                           scroll={{x: 1300}}
-                           expandable={{
-                               expandedRowRender: record => <p style={{margin: 0}}>Created
-                                   at: <b>{record['createdAt']} </b> by <b>{record['createdBy']}</b></p>,
-                           }}>
+                           scroll={{x: 1300}}>
                         <Column align={"center"} title="Ref." dataIndex="ref" key="ref"
                                 sortDirections={['descend', 'ascend']}
                                 sorter={{compare: (a: any, b: any) => alphabeticalSort(a.ref, b.ref), multiple: 3}}

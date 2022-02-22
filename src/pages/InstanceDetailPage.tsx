@@ -27,9 +27,12 @@ import {
     CloudUploadOutlined,
     DownOutlined,
     InboxOutlined,
+    LinkOutlined,
     LockOutlined,
     SettingOutlined,
-    UnlockOutlined
+    UnlockOutlined,
+    CheckOutlined,
+    CloseOutlined
 } from '@ant-design/icons';
 import {useForm} from "antd/lib/form/Form";
 import {alphabeticalSort} from "../utils/sorter";
@@ -61,6 +64,7 @@ const InstanceDetailPage = () => {
     const [generateConfig, setGenerateConfig] = useState<any>([]);
     const [generateOptions, setGenerateOptions] = useState<any>([]);
     const [lock, setLock] = useState(true);
+    const [relations, setRelations] = useState<any>([])
 
     const [classesForm] = useForm();
     const [editForm] = useForm();
@@ -83,6 +87,8 @@ const InstanceDetailPage = () => {
                 return {value: i, label: i}
             }));
 
+            getRelations(res.data.data)
+
         }).catch((err) => {
             message.error(err.toString())
         })
@@ -93,6 +99,16 @@ const InstanceDetailPage = () => {
             setClasses(res.data.data);
         }).catch((err) => {
             message.error(err.toString())
+        });
+    }
+
+    const getRelations = (instance: any) => {
+        ontologyService.getRelationsBetweenClasses({classes: instance.classes_to_map}).then((res) => {
+            let rel = Object.keys(res.data.relations).map((rel: string) => {
+                return instance.relations[rel]
+            })
+
+            setRelations(rel);
         });
     }
 
@@ -220,6 +236,12 @@ const InstanceDetailPage = () => {
         });
     }
 
+    const selectRelation = (value: any, record: any) => {
+        let newInstance = instance;
+        newInstance.relations[record.relation].selected = !value
+        instanceService.editInstances(params.id, {relations: newInstance.relations}).catch(err => message.error(err.toString()))
+    }
+
     const generate = () => {
         mappingService.generateYARRML({ref: params.id, classes: generateConfig}).then((res) => {
             message.success("The YARRRML file has been generated successfully.")
@@ -312,7 +334,19 @@ const InstanceDetailPage = () => {
                 </Table>
                 <Divider/>
                 <h4><b>Relations:</b></h4>
-                <Table bordered size={"small"}>
+                <Table bordered size={"small"} pagination={{pageSize: 5}} dataSource={relations}>
+                    <Column title={"Relation"} dataIndex={"relation"}/>
+                    <Column title={"Selected"} dataIndex={"selected"} align={"center"} render={((value, record) => {
+                        return <Button size={"small"} shape={"circle"} danger={!value} onClick={() => {
+                            selectRelation(value, record)
+                        }}
+                                       icon={value ? <CheckOutlined style={{color: "green"}}/> :
+                                           <CloseOutlined style={{color: "red"}}/>}/>
+                    })
+                    }/>
+                    <Column title={"Actions"} align={"center"} render={(value) => {
+                        return <Space><Button disabled={!value.selected} size={"small"} shape={"circle"} icon={<LinkOutlined/>}/> </Space>
+                    }}/>
                 </Table>
             </Col>
             <Col span={2} style={{paddingLeft: "2%"}}>

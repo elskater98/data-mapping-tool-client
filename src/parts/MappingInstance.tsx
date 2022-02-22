@@ -77,7 +77,7 @@ const MappingInstance = (props: any) => {
     }
 
     const onChangeTable = (selectedValue: any, ontology_value: any) => {
-        setMapping({...mapping, ...mapping[ontology_value.name], [ontology_value.name]: selectedValue});
+        setMapping({...mapping, [ontology_value.name]: selectedValue});
     }
 
 

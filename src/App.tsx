@@ -10,9 +10,10 @@ import ProtectedRoute from "./utils/ProtectedRoute";
 import {Roles} from "./utils/Roles";
 import {Provider} from "react-redux";
 import store from "./store";
-import ListInstances from "./parts/ListInstances";
+import ListInstances from "./pages/ListInstances";
 import InstanceDetailPage from "./pages/InstanceDetailPage";
 import MappingInstance from "./parts/MappingInstance";
+import MappingRelationsInstance from "./parts/MappingRelationsInstance";
 
 // Components
 const {Header, Content, Footer} = Layout;
@@ -56,6 +57,7 @@ function App() {
                                 <Route path={"instances/"} element={<ListInstances/>}/>
                                 <Route path={"instances/:id"} element={<InstanceDetailPage/>}/>
                                 <Route path={"instances/:id/mapping"} element={<MappingInstance/>}/>
+                                <Route path={"instances/:id/link"} element={<MappingRelationsInstance/>}/>
                             </Route>
                             <Route path="*" element={<NoFound/>}/>
                         </Routes>

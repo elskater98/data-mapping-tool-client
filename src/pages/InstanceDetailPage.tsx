@@ -136,6 +136,7 @@ const InstanceDetailPage = () => {
             classes_to_map: values,
         }).then((res) => {
             setInstance(res.data.instance)
+            getRelations(res.data.instance)
             closeClasses();
         }).catch((err) => {
             message.error(err.toString())
@@ -234,6 +235,15 @@ const InstanceDetailPage = () => {
                 })
             }
         });
+    }
+
+    const startLink = (relation: any) => {
+        navigate('link', {
+            state: {
+                ref: params.id,
+                relation: relation
+            }
+        })
     }
 
     const selectRelation = (value: any, record: any) => {
@@ -344,9 +354,13 @@ const InstanceDetailPage = () => {
                                            <CloseOutlined style={{color: "red"}}/>}/>
                     })
                     }/>
-                    <Column title={"Actions"} align={"center"} render={(value) => {
-                        return <Space><Button disabled={!value.selected} size={"small"} shape={"circle"} icon={<LinkOutlined/>}/> </Space>
-                    }}/>
+                    <Column title={"Actions"} align={"center"} render={((value, record) => {
+                        return <Space><Button disabled={!value.selected} size={"small"} shape={"circle"}
+                                              icon={<LinkOutlined/>} onClick={() => {
+                            startLink(record)
+                        }}/></Space>
+                    })
+                    }/>
                 </Table>
             </Col>
             <Col span={2} style={{paddingLeft: "2%"}}>

@@ -30,7 +30,9 @@ import {
     LinkOutlined,
     LockOutlined,
     SettingOutlined,
-    UnlockOutlined
+    UnlockOutlined,
+    CheckOutlined,
+    CloseOutlined
 } from '@ant-design/icons';
 import {useForm} from "antd/lib/form/Form";
 import {alphabeticalSort} from "../utils/sorter";
@@ -62,6 +64,7 @@ const InstanceDetailPage = () => {
     const [generateConfig, setGenerateConfig] = useState<any>([]);
     const [generateOptions, setGenerateOptions] = useState<any>([]);
     const [lock, setLock] = useState(true);
+    const [relations, setRelations] = useState<any>([])
 
     const [classesForm] = useForm();
     const [editForm] = useForm();
@@ -84,6 +87,8 @@ const InstanceDetailPage = () => {
                 return {value: i, label: i}
             }));
 
+            getRelations(res.data.data)
+
         }).catch((err) => {
             message.error(err.toString())
         })
@@ -91,10 +96,19 @@ const InstanceDetailPage = () => {
 
     const getClasses = () => {
         ontologyService.getClasses().then((res) => {
-            let data = res.data.data;
-            setClasses(data);
+            setClasses(res.data.data);
         }).catch((err) => {
             message.error(err.toString())
+        });
+    }
+
+    const getRelations = (instance: any) => {
+        ontologyService.getRelationsBetweenClasses({classes: instance.classes_to_map}).then((res) => {
+            let rel = Object.keys(res.data.relations).map((rel: string) => {
+                return instance.relations[rel]
+            })
+
+            setRelations(rel);
         });
     }
 
@@ -118,31 +132,15 @@ const InstanceDetailPage = () => {
             return {value: i, label: i}
         }));
 
-        // mapping
-        setInstance({...instance, classes_to_map: values});
-
-        let aux_map: any = instance.mapping;
-        if (Object.keys(instance.mapping).length === 0) {
-            for (let i of classes) {
-                aux_map[i.label] = {status: false, fileSelected: instance.filenames[0], columns: {}}
-            }
-            setInstance({...instance, mapping: aux_map})
-        }
-
         instanceService.editInstances(params.id, {
             classes_to_map: values,
-            mapping: aux_map,
         }).then((res) => {
-            setInstance({...instance, classes_to_map: values})
+            setInstance(res.data.instance)
             closeClasses();
         }).catch((err) => {
             message.error(err.toString())
         })
 
-        // relations
-        ontologyService.getRelationsBetweenClasses({classes: values}).then((res) => {
-            instanceService.editInstances(params.id, {relations: res.data.relations}).catch((err) => message.error(err.toString()))
-        }).catch(err => message.error(err.toString()))
     }
 
     // Edit Instance Modal
@@ -158,7 +156,7 @@ const InstanceDetailPage = () => {
     const onFinishEditInstance = () => {
         instanceService.editInstances(params.id, editForm.getFieldsValue()).then((res) => {
             closeEditInstance();
-            getInstanceInfo();
+            setInstance(res.data.instance)
             message.success(res.data.successful);
         }).catch((err) => {
             message.error(err.toString())
@@ -189,8 +187,8 @@ const InstanceDetailPage = () => {
 
         let aux_files = Array.from(new Set(instance.filenames.concat(filenames)));
 
-        setInstance({...instance, filenames: aux_files});
         instanceService.editInstances(params.id, {filenames: aux_files}).then((res) => {
+            setInstance(res.data.instance);
             message.success(res.data.successful)
         }).catch(err => message.error(err.toString()))
         closeUploadModal()
@@ -204,9 +202,10 @@ const InstanceDetailPage = () => {
         // Local Changes
         if (index >= 0 && filename_list.length > 1) {
             filename_list.splice(index, 1);
-            setInstance({...instance, filenames: filename_list})
-            instanceService.editInstances(params.id, {filenames: filename_list}).catch((err) => {
-                message.error(err.data().error)
+            instanceService.editInstances(params.id, {filenames: filename_list}).then((res) => {
+                setInstance(res.data.instance);
+            }).catch((err) => {
+                message.error(err.data().error);
             })
         }
     }
@@ -223,7 +222,6 @@ const InstanceDetailPage = () => {
 
     // Mapping
 
-
     const startMapping = (_class: string) => {
         navigate('mapping', {
             state: {
@@ -236,6 +234,12 @@ const InstanceDetailPage = () => {
                 })
             }
         });
+    }
+
+    const selectRelation = (value: any, record: any) => {
+        let newInstance = instance;
+        newInstance.relations[record.relation].selected = !value
+        instanceService.editInstances(params.id, {relations: newInstance.relations}).catch(err => message.error(err.toString()))
     }
 
     const generate = () => {
@@ -316,8 +320,11 @@ const InstanceDetailPage = () => {
         <Row>
             <Col span={1}/>
             <Col span={10}>
-                <Table bordered={true} size={"middle"} dataSource={instance.classes_to_map}>
-                    <Column width={"80vh"} title={"Class"}
+                <h4><b>Mapping:</b></h4>
+                <Table bordered rowKey={(record) => {
+                    return record
+                }} size={"small"} pagination={{pageSize: 5}} dataSource={instance.classes_to_map}>
+                    <Column title={"Class"}
                             sortDirections={['descend', 'ascend']}
                             sorter={{compare: (a: any, b: any) => alphabeticalSort(a, b)}}/>
                     <Column align={"center"} title={"Actions"} render={(value, record, index) => {
@@ -325,13 +332,28 @@ const InstanceDetailPage = () => {
                                               onClick={() => startMapping(value)}/></Space>
                     }}/>
                 </Table>
-
+                <Divider/>
+                <h4><b>Relations:</b></h4>
+                <Table bordered size={"small"} pagination={{pageSize: 5}} dataSource={relations}>
+                    <Column title={"Relation"} dataIndex={"relation"}/>
+                    <Column title={"Selected"} dataIndex={"selected"} align={"center"} render={((value, record) => {
+                        return <Button size={"small"} shape={"circle"} danger={!value} onClick={() => {
+                            selectRelation(value, record)
+                        }}
+                                       icon={value ? <CheckOutlined style={{color: "green"}}/> :
+                                           <CloseOutlined style={{color: "red"}}/>}/>
+                    })
+                    }/>
+                    <Column title={"Actions"} align={"center"} render={(value) => {
+                        return <Space><Button disabled={!value.selected} size={"small"} shape={"circle"} icon={<LinkOutlined/>}/> </Space>
+                    }}/>
+                </Table>
             </Col>
             <Col span={2} style={{paddingLeft: "2%"}}>
                 <Button type={"primary"} shape="circle" icon={<DownOutlined/>} onClick={showClasses}/>
             </Col>
             <Col span={10}>
-                <Card loading={!instance} title={"Ref.: " + params.id}
+                <Card size={"small"} loading={!instance} title={"Ref.: " + params.id}
                       actions={[
                           <Tooltip title={"Edit"} placement={"bottom"}><SettingOutlined onClick={showEditInstance}
                                                                                         key="setting"/></Tooltip>,
@@ -349,7 +371,7 @@ const InstanceDetailPage = () => {
 
                         <Row justify={"center"} gutter={10} style={{alignItems: "center"}}>
                             <Col span={23}>
-                                <Card style={{marginTop: "1%"}} loading={!instance}>
+                                <Card size={"small"} style={{marginTop: "1%"}} loading={!instance}>
                                     {instance.filenames?.map((i: any) => {
                                         return <Tag closable={instance.filenames.length > 1 && !lock} onClose={() => {
                                             removeFile(i)

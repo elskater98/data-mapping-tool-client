@@ -14,20 +14,19 @@ const MappingInstance = (props: any) => {
     const navigate = useNavigate()
     const {ref, _class, files, current_file}: any = state;
 
-    const [subject, setSubject] = useState<any>(null);
-
-    const [selectedFile, setSelectedFile] = useState(current_file);
     const instanceService = new InstanceService();
     const ontologyService = new OntologyService();
     const fileService = new FileService();
 
+    const [subject, setSubject] = useState<any>(null);
+    const [selectedFile, setSelectedFile] = useState(current_file);
     const [columns, setColumns] = useState<any>([])
     const [sample, setSample] = useState<any>([])
     const [instance, setInstance] = useState<any>({})
     const [properties, setProperties] = useState<any>([])
     const [mapping, setMapping] = useState<any>({})
-    const [lock, setLock] = useState(true);
 
+    const [lock, setLock] = useState(true);
     const [sampleVisible, setSampleVisible] = useState(false);
 
 
@@ -142,7 +141,8 @@ const MappingInstance = (props: any) => {
             <Row>
                 <Col span={24}>
                     <h4><b>Mapping:</b></h4>
-                    <Table bordered={true} pagination={{ defaultPageSize: 5}} loading={properties.length === 0} dataSource={properties}>
+                    <Table bordered={true} pagination={{defaultPageSize: 5}} loading={properties.length === 0}
+                           dataSource={properties}>
                         <Column title={"Properties"} dataIndex={"value"}/>
                         <Column title={"Data set column"} render={(ontology_value, record, index) => {
                             return (<>

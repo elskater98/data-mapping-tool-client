@@ -1,9 +1,9 @@
 import React, {Fragment, useEffect, useState} from "react";
 import {Button, Col, Form, Input, message, Modal, Popconfirm, Progress, Row, Space, Table, Tooltip, Upload} from "antd";
 import {
+    BuildOutlined,
     DeleteOutlined,
     DownloadOutlined,
-    BuildOutlined,
     InboxOutlined,
     PlusOutlined,
     QuestionCircleOutlined,
@@ -14,6 +14,9 @@ import {alphabeticalSort, integerSort} from "../utils/sorter";
 import AuthService from "../services/AuthService";
 import ConfigService from "../services/ConfigService";
 import InstanceService from "../services/InstanceService";
+import {useForm} from "antd/es/form/Form";
+import OntologyService from "../services/OntologyService";
+import fileDownload from "js-file-download";
 
 const {Dragger} = Upload;
 
@@ -23,15 +26,16 @@ const MyInstancesPage = () => {
     const configService = new ConfigService().getConfig()
     const authService = new AuthService()
     const instanceService = new InstanceService();
+    const ontologyService = new OntologyService();
     const navigate = useNavigate();
 
     const [data, setData] = useState<any>([]);
     const [dataSource, setDataSource] = useState<any>([]);
-    const [searchInput, setSearchInput] = useState("");
+    const [searchInput] = useState("");
     const [visible, setVisible] = useState(false);
 
     // Form
-    const [form] = Form.useForm();
+    const [form] = useForm();
 
     const onFinish = (values: any) => {
         values['filenames'] = values.upload_file.fileList.map((i: any) => {
@@ -40,13 +44,13 @@ const MyInstancesPage = () => {
 
         delete values.upload_file;
         instanceService.createInstances(values).then((res) => {
+            ontologyService.initInstance(res.data.instance.ref).catch(err => message.error(err.toString()));
             gatherInstances();
             closeModal();
             message.success("The instances has been created successfully.")
         }).catch((err: any) => {
             message.error(err.toString())
         })
-
     }
 
     // Gather Data
@@ -81,8 +85,6 @@ const MyInstancesPage = () => {
 
 
     const mapping = (ref: string) => {
-
-        // TODO: redirect to the correspondent url
         navigate(ref)
     }
 
@@ -93,6 +95,12 @@ const MyInstancesPage = () => {
             message.error(err.toString())
         });
         setDataSource(dataSource.filter((i: any) => i['ref'] != ref))
+    }
+
+    const downloadInstance = (ref: string) => {
+        instanceService.getInstance(ref).then((res) => {
+            fileDownload(JSON.stringify(res.data.data), `${ref}.json`)
+        })
     }
 
     const handleSearch = (value: string, property: string) => {
@@ -160,12 +168,9 @@ const MyInstancesPage = () => {
             <Row style={{marginTop: "3vh"}}>
                 <Col span={24}>
                     <Table size={"middle"} dataSource={dataSource}
+                           pagination={{defaultPageSize: 10, showSizeChanger: true, pageSizeOptions: [5, 10]}}
                            bordered={true}
-                           scroll={{x: 1300}}
-                           expandable={{
-                               expandedRowRender: record => <p style={{margin: 0}}>Created
-                                   at: <b>{record['createdAt']} </b> by <b>{record['createdBy']}</b></p>,
-                           }}>
+                           scroll={{x: 1300}}>
                         <Column align={"center"} title="Ref." dataIndex="ref" key="ref"
                                 sortDirections={['descend', 'ascend']}
                                 sorter={{compare: (a: any, b: any) => alphabeticalSort(a.ref, b.ref), multiple: 3}}
@@ -234,6 +239,7 @@ const MyInstancesPage = () => {
 
                                             <Tooltip title="Download">
                                                 <Button shape="circle" icon={<DownloadOutlined/>} onClick={() => {
+                                                    downloadInstance(i['ref'])
                                                 }}/>
                                             </Tooltip>
                                         </Space>

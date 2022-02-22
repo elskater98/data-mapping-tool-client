@@ -237,6 +237,15 @@ const InstanceDetailPage = () => {
         });
     }
 
+    const startLink = (relation: any) => {
+        navigate('link', {
+            state: {
+                ref: params.id,
+                relation: relation
+            }
+        })
+    }
+
     const selectRelation = (value: any, record: any) => {
         let newInstance = instance;
         newInstance.relations[record.relation].selected = !value
@@ -345,10 +354,13 @@ const InstanceDetailPage = () => {
                                            <CloseOutlined style={{color: "red"}}/>}/>
                     })
                     }/>
-                    <Column title={"Actions"} align={"center"} render={(value) => {
+                    <Column title={"Actions"} align={"center"} render={((value, record) => {
                         return <Space><Button disabled={!value.selected} size={"small"} shape={"circle"}
-                                              icon={<LinkOutlined/>}/> </Space>
-                    }}/>
+                                              icon={<LinkOutlined/>} onClick={() => {
+                            startLink(record)
+                        }}/></Space>
+                    })
+                    }/>
                 </Table>
             </Col>
             <Col span={2} style={{paddingLeft: "2%"}}>

@@ -1,11 +1,9 @@
-import config from "../config.json";
-
 class ConfigService {
     constructor() {
     }
 
     getConfig() {
-        return config;
+        return {api_url: process.env.REACT_APP_API_URL};
     }
 }
 

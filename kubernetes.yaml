@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: data-mapping-tool-client-deployment
+  labels:
+    app: data-mapping-tool-client
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: data-mapping-tool-client
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: data-mapping-tool-client
+    spec:
+      containers:
+        - name: data-mapping-tool-client
+          image: docker.tech.beegroup-cimne.com/data-mapping-tool/client:latest
+          command: [ "npm", "start" ]
+          ports:
+            - containerPort: 3000
+          volumeMounts:
+            - name: client-secret
+              mountPath: /app/.env
+              subPath: .env
+
+      imagePullSecrets:
+        - name: registrypullsecret
+
+      volumes:
+        - name: client-secret
+          secret:
+            secretName: client-secrets
+            items:
+              - key: .env
+                path: .env
+
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: data-mapping-tool-client-service
+  labels:
+    app: data-mapping-tool-client-service
+spec:
+  type: LoadBalancer
+  selector:
+    app: data-mapping-tool-client
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 3000

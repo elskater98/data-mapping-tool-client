@@ -1,5 +1,114 @@
+import {useEffect, useState} from "react";
+import InstanceService from "../services/InstanceService";
+import {useLocation, useNavigate} from "react-router-dom";
+import {Button, Card, Col, Form, Input, message, Row, Select, Space} from "antd";
+import {useForm} from "antd/lib/form/Form";
+import FileService from "../services/FileService";
+import {ArrowRightOutlined} from '@ant-design/icons';
+
 const MappingRelationsInstance = () => {
-    return <></>
+
+    const instanceService = new InstanceService();
+    const fileService = new FileService();
+
+    const {state} = useLocation();
+    const navigate = useNavigate()
+    const {ref, relation}: any = state;
+
+    const [form] = useForm();
+
+    const [instance, setInstance] = useState<any>({});
+    const [fromOptions, setFromOptions] = useState<any>([]);
+    const [toOptions, setToOptions] = useState<any>([]);
+
+    const [fromRel, setFromRel] = useState("");
+    const [toRel, setToRel] = useState("");
+
+    const getInstance = () => {
+        instanceService.getInstance(ref).then((res) => {
+            let aux_instance = res.data.data;
+            setInstance(aux_instance)
+
+            setFromRel(aux_instance.relations[relation.relation].from_rel)
+            setToRel(aux_instance.relations[relation.relation].to_rel)
+            const to_file = aux_instance.mapping[relation.to].fileSelected
+            const from_file = aux_instance.mapping[relation.from].fileSelected
+
+
+            getSample(from_file).then((res) => {
+                setFromOptions(res.data.columns.map((i: string) => {
+                    return {value: i, label: i}
+                }))
+            })
+
+            getSample(to_file).then((res) => {
+                setToOptions(res.data.columns.map((i: string) => {
+                    return {value: i, label: i}
+                }))
+            })
+        }).catch(err => message.error(err.toString()))
+    }
+
+    const getSample = (selected_file: string) => {
+        return fileService.sample(selected_file).catch(err => message.error(err.toString()))
+    }
+
+    const onFinish = () => {
+        let newInstance = instance;
+        newInstance.relations[relation.relation].from_rel = form.getFieldValue('from_rel')
+        newInstance.relations[relation.relation].to_rel = form.getFieldValue('to_rel')
+        instanceService.editInstances(ref, {relations: newInstance.relations}).catch(err => message.error(err.toString()))
+    }
+
+    const back = () => {
+        navigate(-1)
+    }
+
+    useEffect(() => {
+        getInstance()
+    }, [])
+
+    return <>
+        <Form form={form} onFinish={onFinish} layout={"vertical"} initialValues={{from_rel: fromRel, to_rel: toRel}}>
+            <Space direction={"vertical"} size={"large"}>
+                <Row>
+                    <Space size={"large"}>
+                        <Col>
+                            <Card title={relation.from}>
+                                <Form.Item name={"from_rel"} label={"From Variable"}>
+                                    <Select options={fromOptions} loading={!instance}/>
+                                </Form.Item>
+                            </Card>
+                        </Col>
+
+                        <Col>
+                            <h3>{relation.relation}</h3>
+                            <Button style={{marginLeft: "40%"}} type={"dashed"}
+                                    size={"large"} shape={"circle"} icon={<ArrowRightOutlined/>}/>
+
+                        </Col>
+
+                        <Col>
+                            <Card title={relation.to}>
+                                <Form.Item name={"to_rel"} label={"To Variable"}>
+                                    <Select options={toOptions} loading={!instance}/>
+                                </Form.Item>
+                            </Card>
+
+                        </Col>
+                    </Space>
+                </Row>
+                <Row>
+                    <Form.Item>
+                        <Space>
+                            <Button onClick={back}>Back</Button>
+                            <Button type={"primary"} htmlType="submit">Submit</Button>
+                        </Space>
+                    </Form.Item>
+                </Row>
+            </Space>
+        </Form>
+    </>
 
 }
 export default MappingRelationsInstance;

@@ -6,9 +6,6 @@ class InstanceService {
     private authService = new AuthService();
     private configService = new ConfigService();
 
-    constructor() {
-    }
-
     getInstances() {
         const headers = {
             'Authorization': 'Bearer ' + this.authService.hasCredentials()

@@ -6,9 +6,6 @@ class FileService {
     private authService = new AuthService();
     private configService = new ConfigService();
 
-    constructor() {
-    }
-
     download(filename: string) {
         const headers = {
             'Authorization': 'Bearer ' + this.authService.hasCredentials()

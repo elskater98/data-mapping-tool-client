@@ -29,8 +29,10 @@ const MappingRelationsInstance = () => {
             let aux_instance = res.data.data;
             setInstance(aux_instance)
 
-            setFromRel(aux_instance.relations[relation.relation].from_rel)
-            setToRel(aux_instance.relations[relation.relation].to_rel)
+            form.setFieldsValue({
+                from_rel: aux_instance.relations[relation.relation].from_rel,
+                to_rel: aux_instance.relations[relation.relation].to_rel
+            })
             const to_file = aux_instance.mapping[relation.to].fileSelected
             const from_file = aux_instance.mapping[relation.from].fileSelected
 
@@ -69,14 +71,14 @@ const MappingRelationsInstance = () => {
     }, [])
 
     return <>
-        <Form form={form} onFinish={onFinish} layout={"vertical"} initialValues={{from_rel: fromRel, to_rel: toRel}}>
+        <Form form={form} onFinish={onFinish} layout={"vertical"}>
             <Space direction={"vertical"} size={"large"}>
                 <Row>
                     <Space size={"large"}>
                         <Col>
                             <Card title={relation.from}>
                                 <Form.Item name={"from_rel"} label={"From Variable"}>
-                                    <Select options={fromOptions} loading={!instance}/>
+                                    <Select options={fromOptions}/>
                                 </Form.Item>
                             </Card>
                         </Col>
@@ -91,7 +93,7 @@ const MappingRelationsInstance = () => {
                         <Col>
                             <Card title={relation.to}>
                                 <Form.Item name={"to_rel"} label={"To Variable"}>
-                                    <Select options={toOptions} loading={!instance}/>
+                                    <Select options={toOptions}/>
                                 </Form.Item>
                             </Card>
 

@@ -21,9 +21,6 @@ const MappingRelationsInstance = () => {
     const [fromOptions, setFromOptions] = useState<any>([]);
     const [toOptions, setToOptions] = useState<any>([]);
 
-    const [fromRel, setFromRel] = useState("");
-    const [toRel, setToRel] = useState("");
-
     const getInstance = () => {
         instanceService.getInstance(ref).then((res) => {
             let aux_instance = res.data.data;
@@ -60,6 +57,7 @@ const MappingRelationsInstance = () => {
         newInstance.relations[relation.relation].from_rel = form.getFieldValue('from_rel')
         newInstance.relations[relation.relation].to_rel = form.getFieldValue('to_rel')
         instanceService.editInstances(ref, {relations: newInstance.relations}).catch(err => message.error(err.toString()))
+        navigate(-1)
     }
 
     const back = () => {

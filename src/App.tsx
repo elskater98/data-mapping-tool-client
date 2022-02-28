@@ -14,6 +14,7 @@ import ListInstances from "./pages/ListInstances";
 import InstanceDetailPage from "./pages/InstanceDetailPage";
 import MappingInstance from "./parts/MappingInstance";
 import MappingRelationsInstance from "./parts/MappingRelationsInstance";
+import PreviewResults from "./parts/PreviewResults";
 
 // Components
 const {Header, Content, Footer} = Layout;
@@ -58,6 +59,7 @@ function App() {
                                 <Route path={"instances/:id"} element={<InstanceDetailPage/>}/>
                                 <Route path={"instances/:id/mapping"} element={<MappingInstance/>}/>
                                 <Route path={"instances/:id/link"} element={<MappingRelationsInstance/>}/>
+                                <Route path={"instances/:id/preview"} element={<PreviewResults/>}/>
                             </Route>
                             <Route path="*" element={<NoFound/>}/>
                         </Routes>

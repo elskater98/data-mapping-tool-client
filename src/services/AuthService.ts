@@ -3,9 +3,6 @@ import ConfigService from "./ConfigService";
 import {Cookies} from "react-cookie";
 
 class AuthService {
-    constructor() {
-    }
-
     url = new ConfigService().getConfig().api_url;
     private cookies = new Cookies().getAll();
 

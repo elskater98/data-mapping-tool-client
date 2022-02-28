@@ -6,8 +6,6 @@ class OntologyService {
     private authService = new AuthService();
     private configService = new ConfigService();
 
-    constructor() {
-    }
 
     getProperties(key: string, args?: object) {
         /*

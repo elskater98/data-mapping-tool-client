@@ -7,9 +7,6 @@ class MappingService {
     private authService = new AuthService();
     private configService = new ConfigService();
 
-    constructor() {
-    }
-
     public generateYARRML(payload: object) {
         const headers = {
             'Authorization': 'Bearer ' + this.authService.hasCredentials()

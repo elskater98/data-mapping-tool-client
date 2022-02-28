@@ -1,7 +1,7 @@
 import {useLocation} from "react-router-dom";
 import ReactFlow, {
     addEdge, Background, Connection, Controls, Edge, Elements,
-    isNode,
+    isNode, MiniMap,
     Position, removeElements
 } from 'react-flow-renderer';
 import {useCallback, useEffect, useState} from "react";
@@ -58,21 +58,36 @@ const PreviewResults = () => {
 
 
     useEffect(() => {
-        setElements(getLayoutedElements(instance.classes_to_map.map((value: string, indx: number) => {
+        let class_aux = instance.classes_to_map.map((value: string, indx: number) => {
             return {
-                data: {label: <> {value} </>},
-                id: indx,
-                type: "input",
+                id: value,
+                data: {label: value},
                 position: {x: 0, y: 0}
             }
-        })))
+        });
 
+
+        let rel_aux = relations.map((i: any) => {
+            return {
+                id: i.relation,
+                source: i.from,
+                target: i.to,
+                label: i.relation,
+                type: 'smooth',
+                style: {stroke: instance.relations[i.relation].selected ? 'green' : 'red'},
+                arrowHeadType: 'arrowclosed',
+                animated: true
+            };
+        });
+
+        setElements(getLayoutedElements(class_aux.concat(rel_aux)));
     }, []);
 
     return (
         <>
-            <ReactFlow elements={elements} onConnect={onConnect} onElementsRemove={onElementsRemove}>
+            <ReactFlow elements={elements} onConnect={onConnect} onElementsRemove={onElementsRemove} key="edges">
                 <Controls/>
+                <MiniMap/>
                 <Background color="#aaa" gap={16}/>
             </ReactFlow>
 

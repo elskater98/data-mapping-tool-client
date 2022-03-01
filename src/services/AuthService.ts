@@ -3,9 +3,6 @@ import ConfigService from "./ConfigService";
 import {Cookies} from "react-cookie";
 
 class AuthService {
-    constructor() {
-    }
-
     url = new ConfigService().getConfig().api_url;
     private cookies = new Cookies().getAll();
 
@@ -21,12 +18,12 @@ class AuthService {
         return this.cookies['access_token']
     }
 
-    getProfile(username: string) {
+    getProfile() {
         const headers = {
             'Authorization': 'Bearer ' + this.cookies['access_token']
         };
 
-        return axios.get(this.url + "/users/" + username, {headers})
+        return axios.get(this.url + "/auth/profile", {headers})
     }
 }
 

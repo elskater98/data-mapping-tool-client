@@ -6,9 +6,6 @@ class InstanceService {
     private authService = new AuthService();
     private configService = new ConfigService();
 
-    constructor() {
-    }
-
     getInstances() {
         const headers = {
             'Authorization': 'Bearer ' + this.authService.hasCredentials()
@@ -52,14 +49,6 @@ class InstanceService {
         };
 
         return axios.delete(this.configService.getConfig().api_url + '/instances/' + ref, {headers: headers});
-    }
-
-    setMappedColumns(ref: any, payload: any) {
-        const headers = {
-            'Authorization': 'Bearer ' + this.authService.hasCredentials()
-        };
-
-        return axios.put(this.configService.getConfig().api_url + '/instances/' + ref, payload, {headers: headers});
     }
 
 }

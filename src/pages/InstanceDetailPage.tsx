@@ -32,7 +32,8 @@ import {
     SettingOutlined,
     UnlockOutlined,
     CheckOutlined,
-    CloseOutlined
+    CloseOutlined,
+    FileSearchOutlined
 } from '@ant-design/icons';
 import {useForm} from "antd/lib/form/Form";
 import {alphabeticalSort} from "../utils/sorter";
@@ -255,8 +256,18 @@ const InstanceDetailPage = () => {
     const generate = () => {
         mappingService.generateYARRML({ref: params.id, classes: generateConfig}).then((res) => {
             message.success("The YARRRML file has been generated successfully.")
-            fileDownload(res.data.yaml, "res.yml")
+            fileDownload(res.data.yaml, `${params.id}.yaml`)
         }).catch(err => message.error(err.toString()))
+    }
+
+    const preview = () => {
+        navigate("preview", {
+                state: {
+                    instance: instance,
+                    relations: relations
+                }
+            }
+        )
     }
 
     return (<>
@@ -330,7 +341,7 @@ const InstanceDetailPage = () => {
         <Row>
             <Col span={1}/>
             <Col span={10}>
-                <h4><b>Mapping:</b></h4>
+                <h3><b>Classes</b></h3>
                 <Table bordered rowKey={(record) => {
                     return record
                 }} size={"small"} pagination={{pageSize: 5}} dataSource={instance.classes_to_map}>
@@ -338,12 +349,14 @@ const InstanceDetailPage = () => {
                             sortDirections={['descend', 'ascend']}
                             sorter={{compare: (a: any, b: any) => alphabeticalSort(a, b)}}/>
                     <Column align={"center"} title={"Actions"} render={(value, record, index) => {
-                        return <Space><Button size={"small"} shape={"circle"} icon={<AppstoreAddOutlined/>}
-                                              onClick={() => startMapping(value)}/></Space>
+                        return <Space><Tooltip title={"Map"} placement={"bottom"}><Button size={"small"}
+                                                                                          shape={"circle"}
+                                                                                          icon={<AppstoreAddOutlined/>}
+                                                                                          onClick={() => startMapping(value)}/></Tooltip></Space>
                     }}/>
                 </Table>
                 <Divider/>
-                <h4><b>Relations:</b></h4>
+                <h3><b>Link</b></h3>
                 <Table bordered size={"small"} pagination={{pageSize: 5}} dataSource={relations}>
                     <Column title={"Relation"} dataIndex={"relation"}/>
                     <Column title={"Selected"} dataIndex={"selected"} align={"center"} render={((value, record) => {
@@ -355,10 +368,13 @@ const InstanceDetailPage = () => {
                     })
                     }/>
                     <Column title={"Actions"} align={"center"} render={((value, record) => {
-                        return <Space><Button disabled={!value.selected} size={"small"} shape={"circle"}
-                                              icon={<LinkOutlined/>} onClick={() => {
-                            startLink(record)
-                        }}/></Space>
+                        return <Space><Tooltip title={"Link"} placement={"bottom"}><Button disabled={!value.selected}
+                                                                                           size={"small"}
+                                                                                           shape={"circle"}
+                                                                                           icon={<LinkOutlined/>}
+                                                                                           onClick={() => {
+                                                                                               startLink(record)
+                                                                                           }}/></Tooltip></Space>
                     })
                     }/>
                 </Table>
@@ -404,8 +420,11 @@ const InstanceDetailPage = () => {
                 <Divider/>
                 <Card title={"Generate YARRRML"} actions={[
 
+                    <Tooltip title={"Preview"} placement={"bottom"}> <FileSearchOutlined key={"preview"}
+                                                                                         onClick={preview}/></Tooltip>,
                     <Tooltip title={"Run"} placement={"bottom"}><CaretRightOutlined key="run" style={{color: "green"}}
-                                                                                    onClick={generate}/></Tooltip>]}>
+                                                                                    onClick={generate}/></Tooltip>
+                ]}>
                     <Row>
                         <Col span={24}>
                             <Select mode={"multiple"} loading={!generateOptions} showSearch options={generateOptions}

@@ -254,3 +254,4 @@ package-lock.json
 
 .idea/
 src/config.json
+build/

@@ -413,13 +413,13 @@ const InstanceDetailPage = () => {
                     <Column title={"Selected"} dataIndex={"selected"} align={"center"}
                             sortDirections={['descend', 'ascend']}
                             filters={[{text: "Selected", value: true}, {text: "Unselected", value: false}]}
-                            onFilter={(((value, record) => {
-                                return record.selected === value;
-                            }))}
+                            onFilter={((value, record) => record.selected === value)}
+
                             sorter={{
                                 compare: (a: any, b: any) => alphabeticalSort(a.selected.toString(), b.selected.toString()),
                                 multiple: 2
                             }}
+
                             render={((value, record) => {
                                 return <Button size={"small"} shape={"circle"} danger={!value} onClick={() => {
                                     selectRelation(value, record)

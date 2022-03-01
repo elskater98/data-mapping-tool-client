@@ -33,7 +33,7 @@ import {
     UnlockOutlined,
     CheckOutlined,
     CloseOutlined,
-    FileSearchOutlined
+    FileSearchOutlined, SearchOutlined
 } from '@ant-design/icons';
 import {useForm} from "antd/lib/form/Form";
 import {alphabeticalSort} from "../utils/sorter";
@@ -42,6 +42,7 @@ import AuthService from "../services/AuthService";
 import FileService from "../services/FileService";
 import fileDownload from 'js-file-download';
 import MappingService from "../services/MappingService";
+import {log} from "util";
 
 const {Column} = Table;
 const {Meta} = Card;
@@ -67,6 +68,9 @@ const InstanceDetailPage = () => {
     const [lock, setLock] = useState(true);
     const [relations, setRelations] = useState<any>([])
 
+    const [classSearch, setClassSearch] = useState<any>([])
+    const [relationSearch, setRelationSearch] = useState<any>([])
+
     const [classesForm] = useForm();
     const [editForm] = useForm();
     const [uploadForm] = useForm();
@@ -87,6 +91,8 @@ const InstanceDetailPage = () => {
             setGenerateOptions(res.data.data.classes_to_map.map((i: string) => {
                 return {value: i, label: i}
             }));
+
+            setClassSearch(res.data.data.classes_to_map);
 
             getRelations(res.data.data)
 
@@ -110,6 +116,7 @@ const InstanceDetailPage = () => {
             })
 
             setRelations(rel);
+            setRelationSearch(rel);
         });
     }
 
@@ -270,6 +277,14 @@ const InstanceDetailPage = () => {
         )
     }
 
+    const handleClassSearch = (value: string) => {
+        value === '' ? setClassSearch(instance.classes_to_map) : setClassSearch(instance.classes_to_map.filter((i: any) => i.includes(value)))
+    }
+
+    const handleRelationSearch = (value: string) => {
+        value === '' ? setRelationSearch(relations) : setRelationSearch(relations.filter((i: any) => i.relation.includes(value)))
+    }
+
     return (<>
         {/* Classes Modal */}
         <Modal visible={visibleClasses} onCancel={closeClasses} onOk={classesForm.submit}>
@@ -344,10 +359,25 @@ const InstanceDetailPage = () => {
                 <h3><b>Classes</b></h3>
                 <Table bordered rowKey={(record) => {
                     return record
-                }} size={"small"} pagination={{pageSize: 5}} dataSource={instance.classes_to_map}>
+                }} size={"small"} pagination={{pageSize: 5}} dataSource={classSearch}>
                     <Column title={"Class"}
                             sortDirections={['descend', 'ascend']}
-                            sorter={{compare: (a: any, b: any) => alphabeticalSort(a, b)}}/>
+                            sorter={{compare: (a: any, b: any) => alphabeticalSort(a, b)}}
+                            filterIcon={() => <SearchOutlined/>}
+                            filterDropdown={() => {
+                                return (
+                                    <div style={{padding: 8}}>
+                                        <Input.Search
+                                            allowClear={true}
+                                            defaultValue={""}
+                                            onSearch={i => handleClassSearch(i)}
+                                            placeholder={`Search Class`}
+                                            style={{marginBottom: 8, display: 'block'}}
+                                        />
+                                    </div>
+                                );
+                            }}
+                    />
                     <Column align={"center"} title={"Actions"} render={(value, record, index) => {
                         return <Space><Tooltip title={"Map"} placement={"bottom"}><Button size={"small"}
                                                                                           shape={"circle"}
@@ -357,16 +387,47 @@ const InstanceDetailPage = () => {
                 </Table>
                 <Divider/>
                 <h3><b>Link</b></h3>
-                <Table bordered size={"small"} pagination={{pageSize: 5}} dataSource={relations}>
-                    <Column title={"Relation"} dataIndex={"relation"}/>
-                    <Column title={"Selected"} dataIndex={"selected"} align={"center"} render={((value, record) => {
-                        return <Button size={"small"} shape={"circle"} danger={!value} onClick={() => {
-                            selectRelation(value, record)
-                        }}
-                                       icon={value ? <CheckOutlined style={{color: "green"}}/> :
-                                           <CloseOutlined style={{color: "red"}}/>}/>
-                    })
-                    }/>
+                <Table bordered size={"small"} pagination={{pageSize: 5}} dataSource={relationSearch}>
+                    <Column title={"Relation"} dataIndex={"relation"}
+
+                            sortDirections={['descend', 'ascend']}
+                            sorter={{
+                                compare: (a: any, b: any) => alphabeticalSort(a.relation, b.relation),
+                                multiple: 2
+                            }}
+                            filterIcon={() => <SearchOutlined/>}
+                            filterDropdown={() => {
+                                return (
+                                    <div style={{padding: 8}}>
+                                        <Input.Search
+                                            allowClear={true}
+                                            defaultValue={""}
+                                            onSearch={i => handleRelationSearch(i)}
+                                            placeholder={`Search Relation`}
+                                            style={{marginBottom: 8, display: 'block'}}
+                                        />
+                                    </div>
+                                );
+                            }}
+                    />
+                    <Column title={"Selected"} dataIndex={"selected"} align={"center"}
+                            sortDirections={['descend', 'ascend']}
+                            filters={[{text: "Selected", value: true}, {text: "Unselected", value: false}]}
+                            onFilter={(((value, record) => {
+                                return record.selected === value;
+                            }))}
+                            sorter={{
+                                compare: (a: any, b: any) => alphabeticalSort(a.selected.toString(), b.selected.toString()),
+                                multiple: 2
+                            }}
+                            render={((value, record) => {
+                                return <Button size={"small"} shape={"circle"} danger={!value} onClick={() => {
+                                    selectRelation(value, record)
+                                }}
+                                               icon={value ? <CheckOutlined style={{color: "green"}}/> :
+                                                   <CloseOutlined style={{color: "red"}}/>}/>
+                            })
+                            }/>
                     <Column title={"Actions"} align={"center"} render={((value, record) => {
                         return <Space><Tooltip title={"Link"} placement={"bottom"}><Button disabled={!value.selected}
                                                                                            size={"small"}

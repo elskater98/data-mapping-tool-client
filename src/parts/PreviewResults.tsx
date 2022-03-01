@@ -1,11 +1,19 @@
-import {useLocation} from "react-router-dom";
+import {useLocation, useNavigate} from "react-router-dom";
 import ReactFlow, {
-    addEdge, Background, Connection, Controls, Edge, Elements,
-    isNode, MiniMap,
-    Position, removeElements
+    addEdge,
+    Background,
+    Connection,
+    Controls,
+    Edge,
+    Elements,
+    isNode,
+    MiniMap,
+    Position,
+    removeElements
 } from 'react-flow-renderer';
-import {useCallback, useEffect, useState} from "react";
+import {useEffect, useState} from "react";
 import {graphlib, layout} from "dagrejs";
+import {Button, Col, Row} from "antd";
 
 const dagreGraph = new graphlib.Graph();
 dagreGraph.setDefaultEdgeLabel(() => ({}));
@@ -47,6 +55,7 @@ const PreviewResults = () => {
     const {state} = useLocation();
     const {instance, relations}: any = state;
     const [elements, setElements] = useState<any>([]);
+    const navigate = useNavigate();
 
     const onConnect = (params: Edge<any> | Connection) =>
         setElements((els: Elements<any>) =>
@@ -81,15 +90,27 @@ const PreviewResults = () => {
         });
 
         setElements(getLayoutedElements(class_aux.concat(rel_aux)));
-    }, []);
+    }, [instance.classes_to_map, instance.relations, relations]);
 
     return (
         <>
-            <ReactFlow elements={elements} onConnect={onConnect} onElementsRemove={onElementsRemove} key="edges">
-                <Controls/>
-                <MiniMap/>
-                <Background color="#aaa" gap={16}/>
-            </ReactFlow>
+            <Row style={{height: "80%"}}>
+                <Col span={24}>
+                    <ReactFlow elements={elements} onConnect={onConnect} onElementsRemove={onElementsRemove}
+                               key="edges">
+                        <Controls/>
+                        <MiniMap/>
+                        <Background color="#aaa" gap={16}/>
+                    </ReactFlow>
+                </Col>
+            </Row>
+            <Row style={{marginTop: "2%"}}>
+                <Col span={2}>
+                    <Button onClick={() => {
+                        navigate(-1)
+                    }}>Back</Button>
+                </Col>
+            </Row>
 
         </>
     );

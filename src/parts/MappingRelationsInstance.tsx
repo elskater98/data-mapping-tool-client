@@ -1,7 +1,7 @@
 import {useEffect, useState} from "react";
 import InstanceService from "../services/InstanceService";
 import {useLocation, useNavigate} from "react-router-dom";
-import {Button, Card, Col, Form, Input, message, Row, Select, Space} from "antd";
+import {Button, Card, Col, Form, message, Row, Select, Space} from "antd";
 import {useForm} from "antd/lib/form/Form";
 import FileService from "../services/FileService";
 import {ArrowRightOutlined} from '@ant-design/icons';
@@ -20,6 +20,10 @@ const MappingRelationsInstance = () => {
     const [instance, setInstance] = useState<any>({});
     const [fromOptions, setFromOptions] = useState<any>([]);
     const [toOptions, setToOptions] = useState<any>([]);
+
+    const getSample = (selected_file: string) => {
+        return fileService.sample(selected_file).catch(err => message.error(err.toString()))
+    }
 
     const getInstance = () => {
         instanceService.getInstance(ref).then((res) => {
@@ -48,9 +52,6 @@ const MappingRelationsInstance = () => {
         }).catch(err => message.error(err.toString()))
     }
 
-    const getSample = (selected_file: string) => {
-        return fileService.sample(selected_file).catch(err => message.error(err.toString()))
-    }
 
     const onFinish = () => {
         let newInstance = instance;

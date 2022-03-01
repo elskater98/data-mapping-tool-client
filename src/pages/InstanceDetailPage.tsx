@@ -256,7 +256,7 @@ const InstanceDetailPage = () => {
     const generate = () => {
         mappingService.generateYARRML({ref: params.id, classes: generateConfig}).then((res) => {
             message.success("The YARRRML file has been generated successfully.")
-            fileDownload(res.data.yaml, "res.yml")
+            fileDownload(res.data.yaml, `${params.id}.yaml`)
         }).catch(err => message.error(err.toString()))
     }
 

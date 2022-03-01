@@ -18,12 +18,12 @@ class AuthService {
         return this.cookies['access_token']
     }
 
-    getProfile(username: string) {
+    getProfile() {
         const headers = {
             'Authorization': 'Bearer ' + this.cookies['access_token']
         };
 
-        return axios.get(this.url + "/users/" + username, {headers})
+        return axios.get(this.url + "/auth/profile", {headers})
     }
 }
 

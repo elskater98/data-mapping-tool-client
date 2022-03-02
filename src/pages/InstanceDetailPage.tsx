@@ -22,18 +22,21 @@ import {
 import InstanceService from "../services/InstanceService";
 import {
     AppstoreAddOutlined,
+    ClearOutlined,
     CaretRightOutlined,
+    CheckOutlined,
+    CloseOutlined,
     CloudDownloadOutlined,
     CloudUploadOutlined,
     DownOutlined,
+    FileSearchOutlined,
     InboxOutlined,
     LinkOutlined,
-    LockOutlined,
+    LockOutlined, PlusOutlined,
+    SearchOutlined,
     SettingOutlined,
-    UnlockOutlined,
-    CheckOutlined,
-    CloseOutlined,
-    FileSearchOutlined
+    RollbackOutlined,
+    UnlockOutlined
 } from '@ant-design/icons';
 import {useForm} from "antd/lib/form/Form";
 import {alphabeticalSort} from "../utils/sorter";
@@ -49,7 +52,9 @@ const {Dragger} = Upload;
 
 const InstanceDetailPage = () => {
     const params = useParams();
+    const navigate = useNavigate();
 
+    // Services
     const ontologyService = new OntologyService();
     const instanceService = new InstanceService();
     const fileService = new FileService();
@@ -57,21 +62,28 @@ const InstanceDetailPage = () => {
     const configService = new ConfigService().getConfig()
     const authService = new AuthService()
 
+    // Variables
     const [classes, setClasses] = useState<any>([]);
     const [instance, setInstance] = useState<any>({});
+    const [generateConfig, setGenerateConfig] = useState<any>([]);
+    const [generateOptions, setGenerateOptions] = useState<any>([]);
+    const [relations, setRelations] = useState<any>([])
+
+    // Search
+    const [classSearch, setClassSearch] = useState<any>([])
+    const [relationSearch, setRelationSearch] = useState<any>([])
+
+    // Booleans
     const [visibleClasses, setVisibleClasses] = useState(false);
     const [visibleEditInstance, setVisibleEditInstance] = useState(false);
     const [visibleUpload, setVisibleUpload] = useState(false);
-    const [generateConfig, setGenerateConfig] = useState<any>([]);
-    const [generateOptions, setGenerateOptions] = useState<any>([]);
     const [lock, setLock] = useState(true);
-    const [relations, setRelations] = useState<any>([])
 
+    // Forms
     const [classesForm] = useForm();
     const [editForm] = useForm();
     const [uploadForm] = useForm();
 
-    const navigate = useNavigate();
 
     useEffect(() => {
         getInstanceInfo();
@@ -80,15 +92,17 @@ const InstanceDetailPage = () => {
 
     const getInstanceInfo = () => {
         instanceService.getInstance(params.id).then((res) => {
-            setInstance(res.data.data)
+            let data = res.data.data
+            setInstance(data)
 
             // generate select init values
-            setGenerateConfig((res.data.data.classes_to_map))
-            setGenerateOptions(res.data.data.classes_to_map.map((i: string) => {
+            setGenerateConfig((data.classes_to_map))
+            setGenerateOptions(data.classes_to_map.map((i: string) => {
                 return {value: i, label: i}
             }));
 
-            getRelations(res.data.data)
+            setClassSearch(data.classes_to_map);
+            getRelations(data)
 
         }).catch((err) => {
             message.error(err.toString())
@@ -110,6 +124,7 @@ const InstanceDetailPage = () => {
             })
 
             setRelations(rel);
+            setRelationSearch(rel);
         });
     }
 
@@ -121,6 +136,7 @@ const InstanceDetailPage = () => {
     }
 
     const showClasses = () => {
+        classesForm.setFieldsValue({select: instance.classes_to_map})
         setVisibleClasses(true);
     }
 
@@ -133,12 +149,15 @@ const InstanceDetailPage = () => {
             return {value: i, label: i}
         }));
 
+        let newInstance = {...instance, classes_to_map: values}
+
+        setInstance(newInstance)
+        getRelations(newInstance)
+        setClassSearch(values)
+        closeClasses();
+
         instanceService.editInstances(params.id, {
             classes_to_map: values,
-        }).then((res) => {
-            setInstance(res.data.instance)
-            getRelations(res.data.instance)
-            closeClasses();
         }).catch((err) => {
             message.error(err.toString())
         })
@@ -204,9 +223,8 @@ const InstanceDetailPage = () => {
         // Local Changes
         if (index >= 0 && filename_list.length > 1) {
             filename_list.splice(index, 1);
-            instanceService.editInstances(params.id, {filenames: filename_list}).then((res) => {
-                setInstance(res.data.instance);
-            }).catch((err) => {
+            setInstance({...instance, filenames: filename_list})
+            instanceService.editInstances(params.id, {filenames: filename_list}).catch((err) => {
                 message.error(err.data().error);
             })
         }
@@ -270,16 +288,52 @@ const InstanceDetailPage = () => {
         )
     }
 
+    // Search Functions
+    const handleClassSearch = (value: string) => {
+        value === '' ? setClassSearch(instance.classes_to_map) : setClassSearch(instance.classes_to_map.filter((i: any) => i.includes(value)))
+    }
+
+    const handleRelationSearch = (value: string) => {
+        value === '' ? setRelationSearch(relations) : setRelationSearch(relations.filter((i: any) => i.relation.includes(value)))
+    }
+
+    // Add and clean functions
+
+    const addAll = () => {
+        classesForm.setFieldsValue({select: classes})
+    }
+
+    const undo = () => {
+        classesForm.setFieldsValue({select: instance.classes_to_map})
+
+    }
+
+    const cleanAll = () => {
+        classesForm.resetFields(['select'])
+
+    }
+
     return (<>
         {/* Classes Modal */}
-        <Modal visible={visibleClasses} onCancel={closeClasses} onOk={classesForm.submit}>
+        <Modal visible={visibleClasses} onCancel={closeClasses} onOk={classesForm.submit} width={"50%"}>
             <Form layout={"vertical"} form={classesForm} onFinish={onFinishClasses}>
-                <Form.Item name={"select"} label={"Classes"} rules={[{required: true}]}
-                           initialValue={instance.classes_to_map}>
-                    <Select mode="multiple" placeholder="Select the class/es that you would like to map."
+                <Form.Item name={"select"} label={"Classes"} rules={[{required: true}]}>
+                    <Select mode="multiple"
+                            placeholder="Select the class/es that you would like to map."
                             options={classes}/>
                 </Form.Item>
             </Form>
+            <Divider/>
+            <Space size={"middle"}>
+                <Tooltip title={"Add All"} placement={"bottom"}><Button onClick={addAll} shape={"circle"}
+                                                                        icon={<PlusOutlined/>}/></Tooltip>
+                <Tooltip title={"Clean All"} placement={"bottom"}><Button onClick={cleanAll} shape={"circle"}
+                                                                          icon={<ClearOutlined/>}/>
+                </Tooltip>
+                <Tooltip title={"Undo All"} placement={"bottom"}><Button onClick={undo} shape={"circle"}
+                                                                         icon={<RollbackOutlined/>}/></Tooltip>
+            </Space>
+
         </Modal>
 
         {/* Edit Instance Modal */}
@@ -344,10 +398,26 @@ const InstanceDetailPage = () => {
                 <h3><b>Classes</b></h3>
                 <Table bordered rowKey={(record) => {
                     return record
-                }} size={"small"} pagination={{pageSize: 5}} dataSource={instance.classes_to_map}>
+                }} size={"small"} pagination={{pageSize: 5}} dataSource={classSearch}
+                       loading={!classSearch.length}>
                     <Column title={"Class"}
                             sortDirections={['descend', 'ascend']}
-                            sorter={{compare: (a: any, b: any) => alphabeticalSort(a, b)}}/>
+                            sorter={{compare: (a: any, b: any) => alphabeticalSort(a, b)}}
+                            filterIcon={() => <SearchOutlined/>}
+                            filterDropdown={() => {
+                                return (
+                                    <div style={{padding: 8}}>
+                                        <Input.Search
+                                            allowClear={true}
+                                            defaultValue={""}
+                                            onSearch={i => handleClassSearch(i)}
+                                            placeholder={`Search Class`}
+                                            style={{marginBottom: 8, display: 'block'}}
+                                        />
+                                    </div>
+                                );
+                            }}
+                    />
                     <Column align={"center"} title={"Actions"} render={(value, record, index) => {
                         return <Space><Tooltip title={"Map"} placement={"bottom"}><Button size={"small"}
                                                                                           shape={"circle"}
@@ -357,16 +427,48 @@ const InstanceDetailPage = () => {
                 </Table>
                 <Divider/>
                 <h3><b>Link</b></h3>
-                <Table bordered size={"small"} pagination={{pageSize: 5}} dataSource={relations}>
-                    <Column title={"Relation"} dataIndex={"relation"}/>
-                    <Column title={"Selected"} dataIndex={"selected"} align={"center"} render={((value, record) => {
-                        return <Button size={"small"} shape={"circle"} danger={!value} onClick={() => {
-                            selectRelation(value, record)
-                        }}
-                                       icon={value ? <CheckOutlined style={{color: "green"}}/> :
-                                           <CloseOutlined style={{color: "red"}}/>}/>
-                    })
-                    }/>
+                <Table bordered size={"small"} pagination={{pageSize: 5}} dataSource={relationSearch}
+                       loading={!relationSearch.length}>
+                    <Column title={"Relation"} dataIndex={"relation"}
+
+                            sortDirections={['descend', 'ascend']}
+                            sorter={{
+                                compare: (a: any, b: any) => alphabeticalSort(a.relation, b.relation),
+                                multiple: 2
+                            }}
+                            filterIcon={() => <SearchOutlined/>}
+                            filterDropdown={() => {
+                                return (
+                                    <div style={{padding: 8}}>
+                                        <Input.Search
+                                            allowClear={true}
+                                            defaultValue={""}
+                                            onSearch={i => handleRelationSearch(i)}
+                                            placeholder={`Search Relation`}
+                                            style={{marginBottom: 8, display: 'block'}}
+                                        />
+                                    </div>
+                                );
+                            }}
+                    />
+                    <Column title={"Selected"} dataIndex={"selected"} align={"center"}
+                            sortDirections={['descend', 'ascend']}
+                            filters={[{text: "Selected", value: true}, {text: "Unselected", value: false}]}
+                            onFilter={((value, record) => record.selected === value)}
+
+                            sorter={{
+                                compare: (a: any, b: any) => alphabeticalSort(a.selected.toString(), b.selected.toString()),
+                                multiple: 2
+                            }}
+
+                            render={((value, record) => {
+                                return <Button size={"small"} shape={"circle"} danger={!value} onClick={() => {
+                                    selectRelation(value, record)
+                                }}
+                                               icon={value ? <CheckOutlined style={{color: "green"}}/> :
+                                                   <CloseOutlined style={{color: "red"}}/>}/>
+                            })
+                            }/>
                     <Column title={"Actions"} align={"center"} render={((value, record) => {
                         return <Space><Tooltip title={"Link"} placement={"bottom"}><Button disabled={!value.selected}
                                                                                            size={"small"}
@@ -383,7 +485,7 @@ const InstanceDetailPage = () => {
                 <Button type={"primary"} shape="circle" icon={<DownOutlined/>} onClick={showClasses}/>
             </Col>
             <Col span={10}>
-                <Card size={"small"} loading={!instance} title={"Ref.: " + params.id}
+                <Card size={"small"} loading={!Object.keys(instance).length} title={"Ref.: " + params.id}
                       actions={[
                           <Tooltip title={"Edit"} placement={"bottom"}><SettingOutlined onClick={showEditInstance}
                                                                                         key="setting"/></Tooltip>,
@@ -401,7 +503,7 @@ const InstanceDetailPage = () => {
 
                         <Row justify={"center"} gutter={10} style={{alignItems: "center"}}>
                             <Col span={23}>
-                                <Card size={"small"} style={{marginTop: "1%"}} loading={!instance}>
+                                <Card size={"small"} style={{marginTop: "1%"}} loading={!Object.keys(instance).length}>
                                     {instance.filenames?.map((i: any) => {
                                         return <Tag closable={instance.filenames.length > 1 && !lock} onClose={() => {
                                             removeFile(i)

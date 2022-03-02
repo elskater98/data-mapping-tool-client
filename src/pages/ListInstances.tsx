@@ -168,6 +168,7 @@ const MyInstancesPage = () => {
             <Row style={{marginTop: "3vh"}}>
                 <Col span={24}>
                     <Table size={"middle"} dataSource={dataSource}
+                           loading={!dataSource.length}
                            pagination={{defaultPageSize: 10, showSizeChanger: true, pageSizeOptions: [5, 10]}}
                            bordered={true}
                            scroll={{x: 1300}}>

@@ -35,7 +35,7 @@ import {
     LockOutlined, PlusOutlined,
     SearchOutlined,
     SettingOutlined,
-    SyncOutlined,
+    RollbackOutlined,
     UnlockOutlined
 } from '@ant-design/icons';
 import {useForm} from "antd/lib/form/Form";
@@ -303,6 +303,11 @@ const InstanceDetailPage = () => {
         classesForm.setFieldsValue({select: classes})
     }
 
+    const undo = () => {
+        classesForm.setFieldsValue({select: instance.classes_to_map})
+
+    }
+
     const cleanAll = () => {
         classesForm.resetFields(['select'])
 
@@ -319,11 +324,14 @@ const InstanceDetailPage = () => {
                 </Form.Item>
             </Form>
             <Divider/>
-            <Space>
+            <Space size={"middle"}>
                 <Tooltip title={"Add All"} placement={"bottom"}><Button onClick={addAll} shape={"circle"}
                                                                         icon={<PlusOutlined/>}/></Tooltip>
                 <Tooltip title={"Clean All"} placement={"bottom"}><Button onClick={cleanAll} shape={"circle"}
-                                                                          icon={<ClearOutlined/>}/></Tooltip>
+                                                                          icon={<ClearOutlined/>}/>
+                </Tooltip>
+                <Tooltip title={"Undo All"} placement={"bottom"}><Button onClick={undo} shape={"circle"}
+                                                                         icon={<RollbackOutlined/>}/></Tooltip>
             </Space>
 
         </Modal>

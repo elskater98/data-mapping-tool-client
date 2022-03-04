@@ -1,17 +1,22 @@
-import {Button, Col, Drawer, Form, Input, Row, message} from 'antd';
+import {Button, Col, Drawer, Form, Input, Row, message, Space, Avatar} from 'antd';
 import {LogoutOutlined, UserOutlined} from '@ant-design/icons';
 import React, {Fragment, useState} from "react";
 import {useCookies} from 'react-cookie';
 import AuthService from "../services/AuthService";
+import store from "../store";
+import {setUserStore} from "../actions/main_actions";
 
 const LoginDrawer = () => {
     const authService = new AuthService();
 
     const [cookies, setCookie, removeCookie] = useCookies(['access_token', 'refresh_token']);
     const [visible, setVisible] = useState(false);
+    const [userInfoVisible, setUserInfoVisible] = useState(false);
     const [isLogged, setIsLogged] = useState(typeof cookies.access_token != 'undefined');
+    const [user, setUser] = useState<any>(store.getState().main.user);
 
     const [form] = Form.useForm();
+    const [userForm] = Form.useForm();
 
     const logOut = () => {
         removeCookie('access_token', {path: '/'});
@@ -37,6 +42,15 @@ const LoginDrawer = () => {
         })
     };
 
+    const getUserInfo = () => {
+        if (Object.keys(user).length === 0) {
+            authService.getProfile().then((res) => {
+                store.dispatch(setUserStore( res.data.data))
+            }).catch(err => message.error(err.toString()))
+        }
+    }
+
+
     const showDrawer = () => {
         if (isLogged) {
             logOut();
@@ -54,13 +68,49 @@ const LoginDrawer = () => {
         logIn(values);
     }
 
+    const showUserDrawer = () => {
+        setUserInfoVisible(true)
+        getUserInfo()
+        console.log(user)
+    }
+
+    const closeUserDrawer = () => {
+        setUserInfoVisible(false)
+    }
+
 
     return (
         <Fragment>
-            <Button type="primary" onClick={showDrawer}
-                    icon={!isLogged ? <UserOutlined/> : <LogoutOutlined/>}>
-                {!isLogged ? "Log In" : "Log Out"}
-            </Button>
+            <Space size={"large"}>
+                <Button hidden={!isLogged} type="primary" icon={<UserOutlined/>} shape={"circle"}
+                        onClick={showUserDrawer}/>
+
+                <Button type="primary" onClick={showDrawer}
+                        icon={!isLogged ? <UserOutlined/> : <LogoutOutlined/>}>
+                    {!isLogged ? "Log In" : "Log Out"}
+                </Button>
+            </Space>
+
+            <Drawer visible={userInfoVisible} onClose={closeUserDrawer}>
+                <Form layout={"vertical"}>
+                    <Form.Item name={"firstName"} initialValue={user}>
+                        <Input/>
+                    </Form.Item>
+                    <Form.Item name={"lastName"}>
+
+                    </Form.Item>
+                    <Form.Item name={"username"}>
+
+                    </Form.Item>
+
+                    <Form.Item name={"roles"}>
+
+                    </Form.Item>
+
+                </Form>
+
+            </Drawer>
+
 
             <Drawer
                 title={!isLogged ? "Log In" : "Log Out"}

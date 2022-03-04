@@ -36,12 +36,12 @@ function App() {
                     width: '100%'
                 }}>
                     <Row>
-                        <Col span={18}>
+                        <Col span={14}>
                             <img onClick={() => {
                                 navigate('/')
                             }} className="logo" src={logo} alt="BeeGroup Logo"/>
                         </Col>
-                        <Col span={6}>
+                        <Col span={10}>
                             <div style={{marginLeft: "70%"}}>
                                 <LoginDrawer/>
                             </div>

@@ -5,3 +5,10 @@ export const initReducer = () => {
         type: tag + "init"
     }
 }
+
+export const setUserStore = (payload: any) => {
+    return {
+        type: tag + "setUser",
+        payload: payload
+    }
+}

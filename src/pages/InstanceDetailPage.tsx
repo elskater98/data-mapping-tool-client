@@ -13,7 +13,7 @@ import {
     Progress,
     Row,
     Select,
-    Space,
+    Space, Switch,
     Table,
     Tag,
     Tooltip,
@@ -82,7 +82,10 @@ const InstanceDetailPage = () => {
     // Forms
     const [classesForm] = useForm();
     const [editForm] = useForm();
-    const [uploadForm] = useForm();
+    const [uploadForm] = useForm()
+
+    // loading
+    const [loading, setLoading] = useState<any>({instances: false, classes: false});
 
 
     useEffect(() => {
@@ -91,7 +94,10 @@ const InstanceDetailPage = () => {
     }, []);
 
     const getInstanceInfo = () => {
+        setLoading({...loading, instances: true})
+
         instanceService.getInstance(params.id).then((res) => {
+
             let data = res.data.data
             setInstance(data)
 
@@ -103,17 +109,22 @@ const InstanceDetailPage = () => {
 
             setClassSearch(data.classes_to_map);
             getRelations(data)
+            setLoading({...loading, instances: false})
 
         }).catch((err) => {
             message.error(err.toString())
+            setLoading({...loading, instances: false})
         })
     }
 
     const getClasses = () => {
+        setInstance({...instance, classes: true})
         ontologyService.getClasses().then((res) => {
             setClasses(res.data.data);
+            setInstance({...instance, classes: false})
         }).catch((err) => {
             message.error(err.toString())
+            setInstance({...instance, classes: false})
         });
     }
 
@@ -268,6 +279,7 @@ const InstanceDetailPage = () => {
     const selectRelation = (value: any, record: any) => {
         let newInstance = instance;
         newInstance.relations[record.relation].selected = !value
+        setInstance(newInstance)
         instanceService.editInstances(params.id, {relations: newInstance.relations}).catch(err => message.error(err.toString()))
     }
 
@@ -399,7 +411,7 @@ const InstanceDetailPage = () => {
                 <Table bordered rowKey={(record) => {
                     return record
                 }} size={"small"} pagination={{pageSize: 5}} dataSource={classSearch}
-                       loading={!classSearch.length}>
+                       loading={loading.instances}>
                     <Column title={"Class"}
                             sortDirections={['descend', 'ascend']}
                             sorter={{compare: (a: any, b: any) => alphabeticalSort(a, b)}}
@@ -428,7 +440,7 @@ const InstanceDetailPage = () => {
                 <Divider/>
                 <h3><b>Link</b></h3>
                 <Table bordered size={"small"} pagination={{pageSize: 5}} dataSource={relationSearch}
-                       loading={!relationSearch.length}>
+                       loading={loading.instances}>
                     <Column title={"Relation"} dataIndex={"relation"}
 
                             sortDirections={['descend', 'ascend']}
@@ -461,17 +473,15 @@ const InstanceDetailPage = () => {
                                 multiple: 2
                             }}
 
-                            render={((value, record) => {
-                                return <Button size={"small"} shape={"circle"} danger={!value} onClick={() => {
+                            render={((value, record, index) => {
+                                return <Switch defaultChecked={value} checkedChildren={<CheckOutlined/>}
+                                               unCheckedChildren={<CloseOutlined/>} onClick={() => {
                                     selectRelation(value, record)
-                                }}
-                                               icon={value ? <CheckOutlined style={{color: "green"}}/> :
-                                                   <CloseOutlined style={{color: "red"}}/>}/>
+                                }}/>
                             })
                             }/>
                     <Column title={"Actions"} align={"center"} render={((value, record) => {
-                        return <Space><Tooltip title={"Link"} placement={"bottom"}><Button disabled={!value.selected}
-                                                                                           size={"small"}
+                        return <Space><Tooltip title={"Link"} placement={"bottom"}><Button size={"small"}
                                                                                            shape={"circle"}
                                                                                            icon={<LinkOutlined/>}
                                                                                            onClick={() => {
@@ -485,7 +495,7 @@ const InstanceDetailPage = () => {
                 <Button type={"primary"} shape="circle" icon={<DownOutlined/>} onClick={showClasses}/>
             </Col>
             <Col span={10}>
-                <Card size={"small"} loading={!Object.keys(instance).length} title={"Ref.: " + params.id}
+                <Card size={"small"} loading={loading.instances} title={"Ref.: " + params.id}
                       actions={[
                           <Tooltip title={"Edit"} placement={"bottom"}><SettingOutlined onClick={showEditInstance}
                                                                                         key="setting"/></Tooltip>,
@@ -503,7 +513,7 @@ const InstanceDetailPage = () => {
 
                         <Row justify={"center"} gutter={10} style={{alignItems: "center"}}>
                             <Col span={23}>
-                                <Card size={"small"} style={{marginTop: "1%"}} loading={!Object.keys(instance).length}>
+                                <Card size={"small"} style={{marginTop: "1%"}} loading={loading.instances}>
                                     {instance.filenames?.map((i: any) => {
                                         return <Tag closable={instance.filenames.length > 1 && !lock} onClose={() => {
                                             removeFile(i)
@@ -529,7 +539,7 @@ const InstanceDetailPage = () => {
                 ]}>
                     <Row>
                         <Col span={24}>
-                            <Select mode={"multiple"} loading={!generateOptions} showSearch options={generateOptions}
+                            <Select mode={"multiple"} loading={loading.instances} showSearch options={generateOptions}
                                     style={{minWidth: "100%"}}
                                     value={generateConfig} onChange={(value) => {
                                 setGenerateConfig(value)

@@ -31,6 +31,7 @@ const MyInstancesPage = () => {
 
     const [data, setData] = useState<any>([]);
     const [dataSource, setDataSource] = useState<any>([]);
+    const [dataSourceLoading, setDataSourceLoading] = useState(false);
     const [searchInput] = useState("");
     const [visible, setVisible] = useState(false);
 
@@ -59,6 +60,7 @@ const MyInstancesPage = () => {
     }, [])
 
     const gatherInstances = () => {
+        setDataSourceLoading(true);
         instanceService.getInstances().then((res) => {
             let _data = res.data["data"].map((i: any, index: number) => {
                 i['key'] = i['ref']
@@ -67,8 +69,10 @@ const MyInstancesPage = () => {
             });
             setData(_data);
             setDataSource(_data);
+            setDataSourceLoading(false);
         }).catch((err) => {
             message.error(err.toString())
+            setDataSourceLoading(false);
         });
     }
 
@@ -168,7 +172,7 @@ const MyInstancesPage = () => {
             <Row style={{marginTop: "3vh"}}>
                 <Col span={24}>
                     <Table size={"middle"} dataSource={dataSource}
-                           loading={!dataSource.length}
+                           loading={dataSourceLoading}
                            pagination={{defaultPageSize: 10, showSizeChanger: true, pageSizeOptions: [5, 10]}}
                            bordered={true}
                            scroll={{x: 1300}}>

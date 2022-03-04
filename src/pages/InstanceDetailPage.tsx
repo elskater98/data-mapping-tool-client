@@ -118,13 +118,13 @@ const InstanceDetailPage = () => {
     }
 
     const getClasses = () => {
-        setInstance({...instance, classes: true})
+        setLoading({...loading, classes: true})
         ontologyService.getClasses().then((res) => {
             setClasses(res.data.data);
-            setInstance({...instance, classes: false})
+            setLoading({...loading, classes: false})
         }).catch((err) => {
             message.error(err.toString())
-            setInstance({...instance, classes: false})
+            setLoading({...loading, classes: false})
         });
     }
 
@@ -474,7 +474,7 @@ const InstanceDetailPage = () => {
                             }}
 
                             render={((value, record, index) => {
-                                return <Switch defaultChecked={value} checkedChildren={<CheckOutlined/>}
+                                return <Switch checked={value} checkedChildren={<CheckOutlined/>}
                                                unCheckedChildren={<CloseOutlined/>} onClick={() => {
                                     selectRelation(value, record)
                                 }}/>

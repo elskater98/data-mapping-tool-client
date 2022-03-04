@@ -28,36 +28,44 @@ const MappingInstance = (props: any) => {
 
     const [lock, setLock] = useState(true);
     const [sampleVisible, setSampleVisible] = useState(false);
+    const [loading, setLoading] = useState<any>({ontology: false, sample: false, instance: false})
 
 
     const getSample = (filename: string) => {
+        setLoading({...instance, sample: true})
         fileService.sample(filename).then((res) => {
             setSample(res.data.sample)
             setColumns(res.data.columns.map((i: any) => {
                 return {value: i, label: i, dataIndex: i, key: i, title: i}
             }))
+            setLoading({...loading, sample: false})
         }).catch((err) => {
             message.error(err.toString())
+            setLoading({...loading, sample: false})
         })
     }
 
     const getInstance = () => {
-
+        setLoading({...loading, instance: true})
         instanceService.getInstance(ref).then((res) => {
             setInstance(res.data.data);
             setMapping(res.data.data.mapping[_class].columns);
             setSubject(res.data.data.mapping[_class].subject);
+            setLoading({...loading, instance: false})
         }).catch((err) => {
             message.error(err.toString());
+            setLoading({...loading, instance: false})
         })
     }
 
     const getOntology = () => {
-
+        setLoading({...loading, ontology: true})
         ontologyService.getProperties("data", {classes: _class}).then((res) => {
             setProperties(res.data.data)
+            setLoading({...loading, ontology: false})
         }).catch((err) => {
             message.error(err.toString())
+            setLoading({...loading, ontology: false})
         })
     }
 
@@ -107,7 +115,9 @@ const MappingInstance = (props: any) => {
         <>
             <Modal width={"200vh"} title={current_file} visible={sampleVisible} footer={null}
                    onCancel={closeSampleModal}>
-                <Table scroll={{x: 500}} size={"small"} bordered={true} dataSource={sample} columns={columns}/>
+                <Table scroll={{x: 500}} size={"small"} loading={loading.sample}
+                       pagination={{defaultPageSize: 5, showSizeChanger: true, pageSizeOptions: [5, 10, 15]}}
+                       bordered={true} dataSource={sample} columns={columns}/>
             </Modal>
 
             <Row style={{marginBottom: "3vh"}}>
@@ -141,14 +151,14 @@ const MappingInstance = (props: any) => {
             <Row>
                 <Col span={24}>
                     <h4><b>Mapping:</b></h4>
-                    <Table bordered={true} pagination={{defaultPageSize: 5}} loading={properties.length === 0}
+                    <Table bordered={true} pagination={{defaultPageSize: 5}} loading={loading.ontology}
                            dataSource={properties}>
                         <Column title={"Properties"} dataIndex={"value"}/>
                         <Column title={"Data set column"} render={(ontology_value, record, index) => {
                             return (<>
                                 <Select style={{width: "50vh"}}
                                         showSearch
-                                        loading={columns.length === 0}
+                                        loading={loading.instance}
                                         value={mapping[ontology_value.name]}
                                         options={columns} onChange={(selectedValue, option) => {
                                     onChangeTable(selectedValue, ontology_value)

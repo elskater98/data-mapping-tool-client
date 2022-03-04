@@ -20,12 +20,14 @@ const MappingRelationsInstance = () => {
     const [instance, setInstance] = useState<any>({});
     const [fromOptions, setFromOptions] = useState<any>([]);
     const [toOptions, setToOptions] = useState<any>([]);
+    const [loading, setLoading] = useState({instance: false})
 
     const getSample = (selected_file: string) => {
         return fileService.sample(selected_file).catch(err => message.error(err.toString()))
     }
 
     const getInstance = () => {
+        setLoading({...loading, instance: true});
         instanceService.getInstance(ref).then((res) => {
             let aux_instance = res.data.data;
             setInstance(aux_instance)
@@ -49,7 +51,12 @@ const MappingRelationsInstance = () => {
                     return {value: i, label: i}
                 }))
             })
-        }).catch(err => message.error(err.toString()))
+            setLoading({...loading, instance: false});
+        }).catch((err) => {
+            message.error(err.toString())
+            setLoading({...loading, instance: false});
+
+        })
     }
 
 

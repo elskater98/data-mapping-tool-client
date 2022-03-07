@@ -6,7 +6,7 @@ export const initReducer = () => {
     }
 }
 
-export const setUserStore = (payload: any) => {
+export const setUserInfo = (payload: object) => {
     return {
         type: tag + "setUser",
         payload: payload

@@ -7,7 +7,7 @@ const mainReducer = (state = initialState, action: any) => {
             return initialState
 
         case tag + "setUser":
-            return {...initialState, user: action.payload}
+            return {...state, user: action.payload}
 
         default:
             return state

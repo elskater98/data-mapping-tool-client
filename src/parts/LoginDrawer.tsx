@@ -4,16 +4,17 @@ import React, {Fragment, useState} from "react";
 import {useCookies} from 'react-cookie';
 import AuthService from "../services/AuthService";
 import store from "../store";
-import {setUserStore} from "../actions/main_actions";
+import {setUserInfo} from "../actions/main_actions";
+import UserService from "../services/UserService";
 
 const LoginDrawer = () => {
     const authService = new AuthService();
+    const userService = new UserService();
 
     const [cookies, setCookie, removeCookie] = useCookies(['access_token', 'refresh_token']);
     const [visible, setVisible] = useState(false);
     const [userInfoVisible, setUserInfoVisible] = useState(false);
     const [isLogged, setIsLogged] = useState(typeof cookies.access_token != 'undefined');
-    const [user, setUser] = useState<any>(store.getState().main.user);
 
     const [form] = Form.useForm();
     const [userForm] = Form.useForm();
@@ -43,12 +44,17 @@ const LoginDrawer = () => {
     };
 
     const getUserInfo = () => {
-        if (Object.keys(user).length === 0) {
+        if (Object.keys(store.getState().main.user).length === 0) {
             authService.getProfile().then((res) => {
-                store.dispatch(setUserStore( res.data.data))
+                let user = res.data.data;
+                store.dispatch(setUserInfo(user));
             }).catch(err => message.error(err.toString()))
         }
     }
+
+    let unsubscribe = store.subscribe(() => {
+        userForm.setFieldsValue(store.getState().main.user);
+    })
 
 
     const showDrawer = () => {
@@ -71,11 +77,18 @@ const LoginDrawer = () => {
     const showUserDrawer = () => {
         setUserInfoVisible(true)
         getUserInfo()
-        console.log(user)
     }
 
     const closeUserDrawer = () => {
         setUserInfoVisible(false)
+    }
+
+    const onFinishUser = () => {
+        let user = store.getState().main.user;
+        userService.editUser(user.username, userForm.getFieldsValue()).then(() => {
+            message.success("Your changes have been saved successfully.")
+            closeUserDrawer()
+        }).catch(err => message.error(err.toString()))
     }
 
 
@@ -92,20 +105,21 @@ const LoginDrawer = () => {
             </Space>
 
             <Drawer visible={userInfoVisible} onClose={closeUserDrawer}>
-                <Form layout={"vertical"}>
-                    <Form.Item name={"firstName"} initialValue={user}>
+
+                <Form layout={"vertical"} form={userForm} onFinish={onFinishUser}>
+                    <Form.Item label={"First Name"} name={"firstName"}>
                         <Input/>
                     </Form.Item>
-                    <Form.Item name={"lastName"}>
 
-                    </Form.Item>
-                    <Form.Item name={"username"}>
-
+                    <Form.Item label={"Last Name"} name={"lastName"}>
+                        <Input/>
                     </Form.Item>
 
-                    <Form.Item name={"roles"}>
+                    <Space>
+                        <Button onClick={closeUserDrawer}>Close</Button>
+                        <Button type={"primary"} htmlType={"submit"}>Submit</Button>
+                    </Space>
 
-                    </Form.Item>
 
                 </Form>
 

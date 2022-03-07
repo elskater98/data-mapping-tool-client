@@ -32,10 +32,7 @@ const LoginDrawer = () => {
             setCookie('refresh_token', data.data['access_token'], {path: '/', maxAge: 259200});
             setIsLogged(true);
             onClose();
-            message.success("Successful log In.", 0.5)
-            setTimeout(() => {
-                window.location.reload();
-            }, 500);
+            window.location.reload();
 
         }).catch((err) => {
             console.log(err);

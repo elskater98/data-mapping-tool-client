@@ -92,7 +92,8 @@ const LoginDrawer = () => {
 
     const onFinishUser = () => {
         let user = store.getState().main.user;
-        userService.editUser(user.username, userForm.getFieldsValue()).then(() => {
+        userService.editUser(user.username, userForm.getFieldsValue()).then((res) => {
+            store.dispatch(setUserInfo(res.data.user));
             message.success("Your changes have been saved successfully.")
             closeUser()
         }).catch(err => message.error(err.toString()))

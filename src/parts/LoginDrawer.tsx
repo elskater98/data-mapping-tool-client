@@ -17,7 +17,7 @@ const LoginDrawer = () => {
     const [userInfoVisible, setUserInfoVisible] = useState(false);
     const [isLogged, setIsLogged] = useState(typeof cookies.access_token != 'undefined');
     const [isEditable, setIsEditable] = useState(false);
-    const [isHidden, setIsHidden] = useState(false);
+    const [isHidden, setIsHidden] = useState(true);
 
     const [form] = useForm();
     const [userForm] = useForm();
@@ -81,6 +81,12 @@ const LoginDrawer = () => {
     }
 
     const closeUser = () => {
+        setIsHidden(true);
+        setIsEditable(false);
+        userForm.resetFields();
+        userForm.setFieldsValue(store.getState().main.user)
+
+        passwordForm.resetFields();
         setUserInfoVisible(false)
     }
 
@@ -90,6 +96,11 @@ const LoginDrawer = () => {
             message.success("Your changes have been saved successfully.")
             closeUser()
         }).catch(err => message.error(err.toString()))
+    }
+
+    const onFinishPassword = () => {
+        console.log("sss")
+
     }
 
 
@@ -127,24 +138,57 @@ const LoginDrawer = () => {
                 <Divider/>
 
                 <Space>
-                    <Switch checked={isHidden} onClick={() => {
+                    <Switch checked={!isHidden} onClick={() => {
                         setIsHidden(!isHidden)
                     }}/>
                     <KeyOutlined/>
                 </Space>
 
 
-                <Form style={{marginTop: "5%"}} layout={"vertical"} form={passwordForm} hidden={!isHidden}>
-                    <Form.Item label={"Current Password"} name={"currentPassword"}>
+                <Form style={{marginTop: "5%"}} layout={"vertical"} form={passwordForm} hidden={isHidden}
+                      onFinish={onFinishPassword}>
+
+                    <Form.Item label={"Current Password"} name={"currentPassword"} hasFeedback>
                         <Input.Password/>
                     </Form.Item>
 
-                    <Form.Item label={"New Password"} name={"new_password"}>
+                    <Form.Item
+                        label={"New Password"}
+                        name={"newPassword"}
+                        rules={[
+                            {
+                                required: !isHidden,
+                                message: 'Please input your password!',
+                            },
+                        ]}
+                        hasFeedback>
                         <Input.Password/>
                     </Form.Item>
-                    <Form.Item label={"Repeat Password"} name={"repeat_password"}>
+
+                    <Form.Item
+                        name="confirmPassword"
+                        label="Confirm Password"
+                        dependencies={['newPassword']}
+                        hasFeedback
+                        rules={[
+                            {
+                                required: !isHidden,
+                                message: 'Please confirm your password!',
+                            },
+                            ({getFieldValue}) => ({
+                                validator(rule, value) {
+                                    if (!value || getFieldValue('newPassword') === value) {
+                                        return Promise.resolve();
+                                    }
+                                    return Promise.reject('The two passwords that you entered do not match!');
+                                },
+                            }),
+                        ]}
+                    >
                         <Input.Password/>
                     </Form.Item>
+
+                    <Button htmlType={"submit"} type={"primary"}>Change Password</Button>
                 </Form>
 
 

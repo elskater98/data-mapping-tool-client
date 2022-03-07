@@ -1,5 +1,5 @@
-import {Button, Col, Drawer, Form, Input, Row, message, Space, Avatar} from 'antd';
-import {LogoutOutlined, UserOutlined} from '@ant-design/icons';
+import {Avatar, Button, Card, Col, Drawer, Form, Input, message, Modal, Row, Space} from 'antd';
+import {EditOutlined, KeyOutlined, LockOutlined, LogoutOutlined, UserOutlined} from '@ant-design/icons';
 import React, {Fragment, useState} from "react";
 import {useCookies} from 'react-cookie';
 import AuthService from "../services/AuthService";
@@ -15,6 +15,7 @@ const LoginDrawer = () => {
     const [visible, setVisible] = useState(false);
     const [userInfoVisible, setUserInfoVisible] = useState(false);
     const [isLogged, setIsLogged] = useState(typeof cookies.access_token != 'undefined');
+    const [isEditable, setIsEditable] = useState(false);
 
     const [form] = Form.useForm();
     const [userForm] = Form.useForm();
@@ -76,7 +77,7 @@ const LoginDrawer = () => {
         getUserInfo()
     }
 
-    const closeUserDrawer = () => {
+    const closeUser = () => {
         setUserInfoVisible(false)
     }
 
@@ -84,7 +85,7 @@ const LoginDrawer = () => {
         let user = store.getState().main.user;
         userService.editUser(user.username, userForm.getFieldsValue()).then(() => {
             message.success("Your changes have been saved successfully.")
-            closeUserDrawer()
+            closeUser()
         }).catch(err => message.error(err.toString()))
     }
 
@@ -101,7 +102,8 @@ const LoginDrawer = () => {
                 </Button>
             </Space>
 
-            <Drawer visible={userInfoVisible} onClose={closeUserDrawer}>
+            <Modal visible={userInfoVisible}
+                   onCancel={closeUser}>
 
                 <Form layout={"vertical"} form={userForm} onFinish={onFinishUser}>
                     <Form.Item label={"First Name"} name={"firstName"}>
@@ -113,14 +115,12 @@ const LoginDrawer = () => {
                     </Form.Item>
 
                     <Space>
-                        <Button onClick={closeUserDrawer}>Close</Button>
+                        <Button onClick={closeUser}>Close</Button>
                         <Button type={"primary"} htmlType={"submit"}>Submit</Button>
                     </Space>
-
-
                 </Form>
 
-            </Drawer>
+            </Modal>
 
 
             <Drawer
@@ -139,15 +139,15 @@ const LoginDrawer = () => {
                     <Form.Item
                         label="Email"
                         name="email"
-                        rules={[{required: true, type: "email"}]}>
-                        <Input/>
+                        rules={[{ required: true, message: 'Please input your Email!' }]}>
+                        <Input prefix={<UserOutlined className="site-form-item-icon" />} placeholder="Email" />
                     </Form.Item>
 
                     <Form.Item
                         label="Password"
                         name="password"
-                        rules={[{required: true}]}>
-                        <Input.Password/>
+                        rules={[{ required: true, message: 'Please input your Password!' }]}>
+                        <Input.Password prefix={<LockOutlined className="site-form-item-icon" />}/>
                     </Form.Item>
 
                     <Row>

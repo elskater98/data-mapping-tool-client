@@ -1,11 +1,12 @@
-import {Avatar, Button, Card, Col, Drawer, Form, Input, message, Modal, Row, Space} from 'antd';
-import {EditOutlined, KeyOutlined, LockOutlined, LogoutOutlined, UserOutlined} from '@ant-design/icons';
+import {Button, Col, Divider, Drawer, Form, Input, message, Modal, Row, Space, Switch} from 'antd';
+import {EditOutlined, LockOutlined, LogoutOutlined, UserOutlined, KeyOutlined} from '@ant-design/icons';
 import React, {Fragment, useState} from "react";
 import {useCookies} from 'react-cookie';
 import AuthService from "../services/AuthService";
 import store from "../store";
 import {setUserInfo} from "../actions/main_actions";
 import UserService from "../services/UserService";
+import {useForm} from "antd/lib/form/Form";
 
 const LoginDrawer = () => {
     const authService = new AuthService();
@@ -16,9 +17,11 @@ const LoginDrawer = () => {
     const [userInfoVisible, setUserInfoVisible] = useState(false);
     const [isLogged, setIsLogged] = useState(typeof cookies.access_token != 'undefined');
     const [isEditable, setIsEditable] = useState(false);
+    const [isHidden, setIsHidden] = useState(false);
 
-    const [form] = Form.useForm();
-    const [userForm] = Form.useForm();
+    const [form] = useForm();
+    const [userForm] = useForm();
+    const [passwordForm] = useForm();
 
     const logOut = () => {
         removeCookie('access_token', {path: '/'});
@@ -103,22 +106,47 @@ const LoginDrawer = () => {
             </Space>
 
             <Modal visible={userInfoVisible}
-                   onCancel={closeUser}>
+                   onCancel={closeUser} onOk={isEditable ? userForm.submit : closeUser}>
 
                 <Form layout={"vertical"} form={userForm} onFinish={onFinishUser}>
+                    <h3><b>User Profile</b></h3>
                     <Form.Item label={"First Name"} name={"firstName"}>
-                        <Input/>
+                        <Input disabled={!isEditable}/>
                     </Form.Item>
 
                     <Form.Item label={"Last Name"} name={"lastName"}>
-                        <Input/>
+                        <Input disabled={!isEditable}/>
                     </Form.Item>
-
                     <Space>
-                        <Button onClick={closeUser}>Close</Button>
-                        <Button type={"primary"} htmlType={"submit"}>Submit</Button>
+                        <Switch checked={isEditable} onClick={() => {
+                            setIsEditable(!isEditable)
+                        }}/>
+                        <EditOutlined/>
                     </Space>
                 </Form>
+                <Divider/>
+
+                <Space>
+                    <Switch checked={isHidden} onClick={() => {
+                        setIsHidden(!isHidden)
+                    }}/>
+                    <KeyOutlined/>
+                </Space>
+
+
+                <Form style={{marginTop: "5%"}} layout={"vertical"} form={passwordForm} hidden={!isHidden}>
+                    <Form.Item label={"Current Password"} name={"currentPassword"}>
+                        <Input.Password/>
+                    </Form.Item>
+
+                    <Form.Item label={"New Password"} name={"new_password"}>
+                        <Input.Password/>
+                    </Form.Item>
+                    <Form.Item label={"Repeat Password"} name={"repeat_password"}>
+                        <Input.Password/>
+                    </Form.Item>
+                </Form>
+
 
             </Modal>
 
@@ -139,15 +167,15 @@ const LoginDrawer = () => {
                     <Form.Item
                         label="Email"
                         name="email"
-                        rules={[{ required: true, message: 'Please input your Email!' }]}>
-                        <Input prefix={<UserOutlined className="site-form-item-icon" />} placeholder="Email" />
+                        rules={[{required: true, message: 'Please input your Email!'}]}>
+                        <Input prefix={<UserOutlined className="site-form-item-icon"/>} placeholder="Email"/>
                     </Form.Item>
 
                     <Form.Item
                         label="Password"
                         name="password"
-                        rules={[{ required: true, message: 'Please input your Password!' }]}>
-                        <Input.Password prefix={<LockOutlined className="site-form-item-icon" />}/>
+                        rules={[{required: true, message: 'Please input your Password!'}]}>
+                        <Input.Password prefix={<LockOutlined className="site-form-item-icon"/>}/>
                     </Form.Item>
 
                     <Row>

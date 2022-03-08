@@ -2,7 +2,7 @@ import React from 'react';
 import './App.css'
 import {Col, Layout, Row} from "antd";
 import logo from "./assets/beegroup_logo.png";
-import LoginDrawer from "./parts/LoginDrawer";
+import CustomHeader from "./parts/CustomHeader";
 import NoFound from "./pages/NoFound";
 import {Navigate, Route, Routes, useNavigate} from "react-router-dom";
 import HomaPage from "./pages/HomaPage";
@@ -36,14 +36,14 @@ function App() {
                     width: '100%'
                 }}>
                     <Row>
-                        <Col span={18}>
+                        <Col span={14}>
                             <img onClick={() => {
                                 navigate('/')
                             }} className="logo" src={logo} alt="BeeGroup Logo"/>
                         </Col>
-                        <Col span={6}>
+                        <Col span={10}>
                             <div style={{marginLeft: "70%"}}>
-                                <LoginDrawer/>
+                                <CustomHeader/>
                             </div>
                         </Col>
                     </Row>

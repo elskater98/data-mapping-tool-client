@@ -1,8 +1,25 @@
-# data-mapping-tool-client
+# Data Mapping Tool
 
-## Environment
+This repository is the `fronted` part of the Data Mapping Tool Project. This part uses `React.js` + `Typescript` to
+develop the user's visual interface to interact with our [API](https://github.com/elskater98/data-mapping-tool-api).
+Furthermore, the project aims to make the process of mapping data using a single ontology or multiple ones. In our case,
+the the project uses the BIGG ontology as background.
 
-    {
-        npm: '8.1.0',
-        node: '16.13.0'
-    }
+## Getting Started
+
+### Prerequisite
+
+- `npm 8.1.0` or latest
+- `node 16.13.0` or latest
+
+### Install Dependencies
+To install all the dependencies of the project, you should run the following command:
+
+    npm install
+
+### Run Project
+    npm start
+
+### File format: .env
+    REACT_APP_API_URL=http://localhost:8080
+    WDS_SOCKET_PORT=0

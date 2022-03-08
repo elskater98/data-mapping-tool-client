@@ -21,7 +21,7 @@ class UserService {
         };
 
 
-        return axios.patch(this.configService.getConfig().api_url + '/users/' + username + '/change/password', payload, {headers: headers})
+        return axios.post(this.configService.getConfig().api_url + '/users/' + username + '/change/password', payload, {headers: headers})
     }
 
 }

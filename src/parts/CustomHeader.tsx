@@ -7,8 +7,9 @@ import store from "../store";
 import {setUserInfo} from "../actions/main_actions";
 import UserService from "../services/UserService";
 import {useForm} from "antd/lib/form/Form";
+import {PasswordInput} from "antd-password-input-strength";
 
-const LoginDrawer = () => {
+const CustomHeader = () => {
     const authService = new AuthService();
     const userService = new UserService();
 
@@ -100,7 +101,15 @@ const LoginDrawer = () => {
     }
 
     const onFinishPassword = () => {
-        console.log("sss")
+        let user = store.getState().main.user;
+        userService.changePassword(user.username, passwordForm.getFieldsValue()).then((res) => {
+            message.success("Your changes have been saved successfully.")
+            closeUser();
+        }).catch((err) => {
+            let error = err.response.data;
+            let _message = `${error.error} Password require at least: ${error.password_requirements}.`
+            message.error(_message)
+        })
 
     }
 
@@ -163,7 +172,7 @@ const LoginDrawer = () => {
                             },
                         ]}
                         hasFeedback>
-                        <Input.Password/>
+                        <PasswordInput/>
                     </Form.Item>
 
                     <Form.Item
@@ -239,4 +248,4 @@ const LoginDrawer = () => {
 
 }
 
-export default LoginDrawer;
+export default CustomHeader;

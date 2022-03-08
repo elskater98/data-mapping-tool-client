@@ -2,7 +2,7 @@ import React from 'react';
 import './App.css'
 import {Col, Layout, Row} from "antd";
 import logo from "./assets/beegroup_logo.png";
-import LoginDrawer from "./parts/LoginDrawer";
+import CustomHeader from "./parts/CustomHeader";
 import NoFound from "./pages/NoFound";
 import {Navigate, Route, Routes, useNavigate} from "react-router-dom";
 import HomaPage from "./pages/HomaPage";
@@ -43,7 +43,7 @@ function App() {
                         </Col>
                         <Col span={10}>
                             <div style={{marginLeft: "70%"}}>
-                                <LoginDrawer/>
+                                <CustomHeader/>
                             </div>
                         </Col>
                     </Row>

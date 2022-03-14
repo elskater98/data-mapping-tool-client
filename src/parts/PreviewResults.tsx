@@ -6,50 +6,13 @@ import ReactFlow, {
     Controls,
     Edge,
     Elements,
-    isNode,
     MiniMap,
-    Position,
     removeElements
 } from 'react-flow-renderer';
 import {useEffect, useState} from "react";
-import {graphlib, layout} from "dagrejs";
 import {Button, Col, Row} from "antd";
+import {getLayoutedElements} from "../utils/ReactFlowUtils";
 
-const dagreGraph = new graphlib.Graph();
-dagreGraph.setDefaultEdgeLabel(() => ({}));
-
-const nodeWidth = 172;
-const nodeHeight = 36;
-
-const getLayoutedElements = (elements: any[], direction = 'TB') => {
-
-    dagreGraph.setGraph({rankdir: direction});
-
-    elements.forEach((el) => {
-        if (isNode(el)) {
-            dagreGraph.setNode(el.id, {width: nodeWidth, height: nodeHeight});
-        } else {
-            dagreGraph.setEdge(el.source, el.target);
-        }
-    });
-
-    layout(dagreGraph);
-
-    return elements.map((el) => {
-        if (isNode(el)) {
-            const nodeWithPosition = dagreGraph.node(el.id);
-
-            el.targetPosition = Position.Left
-            el.sourcePosition = Position.Right
-
-            el.position = {
-                x: nodeWithPosition.x - nodeWidth / 2 + Math.random() / 1000,
-                y: nodeWithPosition.y - nodeHeight / 2,
-            };
-        }
-        return el;
-    });
-};
 
 const PreviewResults = () => {
     const {state} = useLocation();

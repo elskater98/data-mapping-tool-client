@@ -1,10 +1,10 @@
 import {useLocation, useNavigate} from "react-router-dom";
-import {Button, Col, Divider, Form, Input, message, Modal, Popconfirm, Row, Select, Space, Steps, Table} from "antd";
+import {Button, Col, Divider, message, Modal, Popconfirm, Row, Select, Table} from "antd";
 import React, {useEffect, useState} from "react";
 import InstanceService from "../services/InstanceService";
 import FileService from "../services/FileService";
 import OntologyService from "../services/OntologyService";
-import {LockOutlined, UnlockOutlined, QuestionCircleOutlined, TableOutlined} from "@ant-design/icons";
+import {LockOutlined, QuestionCircleOutlined, TableOutlined, UnlockOutlined} from "@ant-design/icons";
 
 const {Column} = Table;
 

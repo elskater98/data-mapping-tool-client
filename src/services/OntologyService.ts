@@ -47,6 +47,10 @@ class OntologyService {
         return axios.post(this.configService.getConfig().api_url + '/ontology/init/instance/' + ref, {}, {headers: headers})
     }
 
+    getOntologyPreview() {
+        return axios.get(this.configService.getConfig().api_url + '/ontology')
+    }
+
 }
 
 export default OntologyService;

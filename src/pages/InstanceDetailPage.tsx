@@ -67,7 +67,7 @@ const InstanceDetailPage = () => {
     const [instance, setInstance] = useState<any>({});
     const [generateConfig, setGenerateConfig] = useState<any>([]);
     const [generateOptions, setGenerateOptions] = useState<any>([]);
-    const [relations, setRelations] = useState<any>([])
+    const [relations, setRelations] = useState<any>([]);
 
     // Search
     const [classSearch, setClassSearch] = useState<any>([])

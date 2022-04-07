@@ -2,7 +2,7 @@ import React, {Fragment, useEffect, useState} from "react";
 import OntologyService from "../services/OntologyService";
 import {Button, Col, Form, Input, message, Modal, Popconfirm, Row, Select, Space, Table, Tooltip, Upload} from "antd";
 import {
-    DeleteOutlined,
+    DeleteOutlined, DownloadOutlined,
     EditOutlined,
     GlobalOutlined,
     InboxOutlined,
@@ -14,6 +14,7 @@ import {useForm} from "antd/lib/form/Form";
 import ConfigService from "../services/ConfigService";
 import AuthService from "../services/AuthService";
 import {Option} from "antd/lib/mentions";
+import fileDownload from "js-file-download";
 
 const {Dragger} = Upload;
 const {Column} = Table;
@@ -85,6 +86,14 @@ const ListOntologies = () => {
         ontologyService.removeOntology(id).then(res => gatherOntologies()).catch(err => message.error(err.toString()))
     }
 
+    const downloadOntology = (record: any) => {
+        let id = record._id.$oid;
+
+        ontologyService.downloadOntology(id).then((res) => {
+            fileDownload(JSON.stringify(res.data.data), `${id}.owl`)
+        }).catch(err => message.error(err.toString()))
+    }
+
     useEffect(() => {
         gatherOntologies()
     }, [])
@@ -101,7 +110,7 @@ const ListOntologies = () => {
                             <Input placeholder={"Ontology Name"}/>
                         </Form.Item>
 
-                        <Form.Item name={"filename"} label={"Filename"} hasFeedback>
+                        <Form.Item name={"filename"} label={"Filename"}>
                             <Input disabled/>
                         </Form.Item>
 
@@ -113,8 +122,8 @@ const ListOntologies = () => {
                     <Col span={11}>
                         <Form.Item name={"visibility"} label={"Visibility"}>
                             <Select>
-                                <Option value={"public"}>Public <GlobalOutlined/></Option>
-                                <Option value={"private"}>Private <LockOutlined/></Option>
+                                <Option value={"public"}>Public <GlobalOutlined/> </Option>
+                                <Option value={"private"}>Private <LockOutlined/> </Option>
                             </Select>
                         </Form.Item>
                     </Col>
@@ -191,6 +200,12 @@ const ListOntologies = () => {
                                                 setCurrentRecord(record)
                                                 setEditOntology(true)
                                                 editForm.setFieldsValue(record)
+                                            }}/>
+                                        </Tooltip>
+
+                                        <Tooltip title="Download">
+                                            <Button shape="circle" icon={<DownloadOutlined/>} onClick={() => {
+                                                downloadOntology(record)
                                             }}/>
                                         </Tooltip>
 

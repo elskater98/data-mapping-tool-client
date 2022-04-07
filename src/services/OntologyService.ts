@@ -82,6 +82,14 @@ class OntologyService {
 
         return axios.patch(this.configService.getConfig().api_url + '/ontology/' + id, payload, {headers: headers})
     }
+
+    downloadOntology(id: string) {
+        const headers = {
+            'Authorization': 'Bearer ' + this.authService.hasCredentials()
+        };
+
+        return axios.get(this.configService.getConfig().api_url + '/ontology/' + id + '/download', {headers: headers})
+    }
 }
 
 export default OntologyService;

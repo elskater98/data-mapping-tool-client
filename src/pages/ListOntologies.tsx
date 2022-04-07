@@ -11,9 +11,9 @@ import {
     QuestionCircleOutlined
 } from "@ant-design/icons";
 import {useForm} from "antd/lib/form/Form";
-import {Option} from "antd/es/mentions";
 import ConfigService from "../services/ConfigService";
 import AuthService from "../services/AuthService";
+import {Option} from "antd/lib/mentions";
 
 const {Dragger} = Upload;
 const {Column} = Table;
@@ -25,10 +25,13 @@ const ListOntologies = () => {
 
     const [dataSource, setDataSource] = useState<any>([])
     const [loading, setLoading] = useState<any>({ontologies: false})
+    const [currentRecord, setCurrentRecord] = useState<any>(null)
     const [fileAccess, setFileAccess] = useState<any>("")
 
     const [createOntology, setCreateOntology] = useState<boolean>(false)
+    const [editOntology, setEditOntology] = useState<boolean>(false)
     const [createForm] = useForm();
+    const [editForm] = useForm();
 
     const gatherOntologies = () => {
         setLoading({...loading, ontologies: true})
@@ -53,8 +56,19 @@ const ListOntologies = () => {
         gatherOntologies()
     }
 
-    const onFinishCreateForm = () => {
-        closeCreateModal();
+    const closeEditModal = () => {
+        editForm.resetFields()
+        setEditOntology(false)
+        gatherOntologies()
+    }
+
+    const edit = () => {
+
+        ontologyService.editOntology(currentRecord._id.$oid, editForm.getFieldsValue()).then((res) => {
+        }).catch((err) => {
+            message.error(err.toString())
+        })
+        closeEditModal();
     }
 
     const onChangeDragger = (info: any) => {
@@ -75,11 +89,43 @@ const ListOntologies = () => {
         gatherOntologies()
     }, [])
 
+
     return (<>
 
+        <Modal visible={editOntology} onCancel={closeEditModal} onOk={editForm.submit} width={"100vh"}>
+            <Form form={editForm} layout={"vertical"} onFinish={edit}>
+                <Row>
+                    <Col span={11}>
+
+                        <Form.Item name={"ontology_name"} label={"Name"} rules={[{required: true}]} hasFeedback>
+                            <Input placeholder={"Ontology Name"}/>
+                        </Form.Item>
+
+                        <Form.Item name={"filename"} label={"Filename"} hasFeedback>
+                            <Input disabled/>
+                        </Form.Item>
+
+                        <Form.Item name={"description"} label={"Description"}>
+                            <Input.TextArea maxLength={280}/>
+                        </Form.Item>
+                    </Col>
+                    <Col span={1}/>
+                    <Col span={11}>
+                        <Form.Item name={"visibility"} label={"Visibility"}>
+                            <Select>
+                                <Option value={"public"}>Public <GlobalOutlined/></Option>
+                                <Option value={"private"}>Private <LockOutlined/></Option>
+                            </Select>
+                        </Form.Item>
+                    </Col>
+                </Row>
+
+
+            </Form>
+        </Modal>
+
         <Modal visible={createOntology} onCancel={closeCreateModal} onOk={createForm.submit} width={"100vh"}>
-            <Form form={createForm} layout={"vertical"} onFinish={onFinishCreateForm}
-                  initialValues={{visibility: "private"}}>
+            <Form form={createForm} layout={"vertical"} onFinish={closeCreateModal}>
                 <Row>
                     <Col span={10}>
                         <Form.Item name={"ontology_name"} label={"Name"} rules={[{required: true}]} hasFeedback>
@@ -140,10 +186,11 @@ const ListOntologies = () => {
                             render={(value, record, index) => (
                                 <Fragment>
                                     <Space size={"large"}>
-
                                         <Tooltip title="Edit">
                                             <Button shape="circle" icon={<EditOutlined/>} onClick={() => {
-
+                                                setCurrentRecord(record)
+                                                setEditOntology(true)
+                                                editForm.setFieldsValue(record)
                                             }}/>
                                         </Tooltip>
 

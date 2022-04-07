@@ -66,6 +66,14 @@ class OntologyService {
 
         return axios.get(this.configService.getConfig().api_url + '/ontology/' + id, {headers: headers})
     }
+
+    removeOntology(id: string) {
+        const headers = {
+            'Authorization': 'Bearer ' + this.authService.hasCredentials()
+        };
+
+        return axios.delete(this.configService.getConfig().api_url + '/ontology/' + id, {headers: headers})
+    }
 }
 
 export default OntologyService;

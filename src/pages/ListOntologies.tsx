@@ -67,6 +67,10 @@ const ListOntologies = () => {
         }
     }
 
+    const remove = (id: string) => {
+        ontologyService.removeOntology(id).then(res => gatherOntologies()).catch(err => message.error(err.toString()))
+    }
+
     useEffect(() => {
         gatherOntologies()
     }, [])
@@ -144,7 +148,7 @@ const ListOntologies = () => {
                                         </Tooltip>
 
                                         <Popconfirm title="Are you sure？" onConfirm={() => {
-
+                                            remove(value._id.$oid)
                                         }}
                                                     icon={<QuestionCircleOutlined style={{color: 'red'}}/>}>
                                             <a href="#"><Button shape="circle" icon={<DeleteOutlined/>}/></a>

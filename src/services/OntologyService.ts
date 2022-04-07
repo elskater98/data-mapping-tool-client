@@ -48,9 +48,24 @@ class OntologyService {
     }
 
     getOntologyPreview() {
-        return axios.get(this.configService.getConfig().api_url + '/ontology')
+        return axios.get(this.configService.getConfig().api_url + '/ontology/view')
     }
 
+    getOntologies() {
+        const headers = {
+            'Authorization': 'Bearer ' + this.authService.hasCredentials()
+        };
+
+        return axios.get(this.configService.getConfig().api_url + '/ontology/', {headers: headers})
+    }
+
+    getOntology(id: string) {
+        const headers = {
+            'Authorization': 'Bearer ' + this.authService.hasCredentials()
+        };
+
+        return axios.get(this.configService.getConfig().api_url + '/ontology/' + id, {headers: headers})
+    }
 }
 
 export default OntologyService;

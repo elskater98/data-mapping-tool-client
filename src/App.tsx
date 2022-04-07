@@ -10,7 +10,7 @@ import ProtectedRoute from "./utils/ProtectedRoute";
 import {Roles} from "./utils/Roles";
 import {Provider} from "react-redux";
 import store from "./store";
-import {NodeIndexOutlined} from "@ant-design/icons";
+import {NodeIndexOutlined, BranchesOutlined} from "@ant-design/icons";
 import ListInstances from "./pages/ListInstances";
 import InstanceDetailPage from "./pages/InstanceDetailPage";
 import MappingInstance from "./parts/MappingInstance";
@@ -18,6 +18,7 @@ import MappingRelationsInstance from "./parts/MappingRelationsInstance";
 import PreviewResults from "./parts/PreviewResults";
 import PreviewOntology from "./parts/PreviewOntology";
 import OntologyService from "./services/OntologyService";
+import ListOntologies from "./pages/ListOntologies";
 
 // Components
 const {Header, Content, Footer} = Layout;
@@ -52,10 +53,16 @@ function App() {
                                         navigate('/')
                                     }} className="logo" src={logo} alt="BeeGroup Logo"/>
                                 </Menu.Item>
+
                                 <Menu.Item key={"/instances"} title={"Instances"} icon={<NodeIndexOutlined/>}
                                            onClick={() => {
                                                navigate('/instances')
                                            }}>Instances</Menu.Item>
+
+                                <Menu.Item key={"/ontologies"} title={"Ontologies"} icon={<BranchesOutlined/>}
+                                           onClick={() => {
+                                               navigate('/ontologies')
+                                           }}>Ontologies</Menu.Item>
                             </Menu>
                         </Col>
                         <Col span={10}>
@@ -78,6 +85,7 @@ function App() {
                                 <Route path={"instances/:id/link"} element={<MappingRelationsInstance/>}/>
                                 <Route path={"instances/:id/preview"} element={<PreviewResults/>}/>
                             </Route>
+                            <Route path={"ontologies/"} element={<ListOntologies/>}/>
                             <Route path="*" element={<NoFound/>}/>
                         </Routes>
                     </div>

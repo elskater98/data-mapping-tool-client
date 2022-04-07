@@ -143,7 +143,7 @@ const MyInstancesPage = () => {
                         <Col span={2}/>
                         <Col span={10}>
                             <Form.Item name={"upload_file"} label={"Upload Data"} rules={[{required: true}]}>
-                                <Dragger accept={".json,.csv"}
+                                <Dragger accept={".csv"}
                                          action={configService.api_url + "/files/upload"}
                                          headers={{Authorization: "Bearer " + authService.hasCredentials()}}
                                          onChange={onChangeDragger}>

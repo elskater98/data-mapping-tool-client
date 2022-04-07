@@ -90,7 +90,6 @@ const InstanceDetailPage = () => {
 
     useEffect(() => {
         getInstanceInfo();
-        getClasses();
     }, []);
 
     const getInstanceInfo = () => {
@@ -99,6 +98,7 @@ const InstanceDetailPage = () => {
         instanceService.getInstance(params.id).then((res) => {
 
             let data = res.data.data
+            getClasses(data.current_ontology);
             setInstance(data)
 
             // generate select init values
@@ -117,9 +117,9 @@ const InstanceDetailPage = () => {
         })
     }
 
-    const getClasses = () => {
+    const getClasses = (id: string) => {
         setLoading({...loading, classes: true})
-        ontologyService.getClasses().then((res) => {
+        ontologyService.getClasses(id).then((res) => {
             setClasses(res.data.data);
             setLoading({...loading, classes: false})
         }).catch((err) => {
@@ -129,7 +129,7 @@ const InstanceDetailPage = () => {
     }
 
     const getRelations = (instance: any) => {
-        ontologyService.getRelationsBetweenClasses({classes: instance.classes_to_map}).then((res) => {
+        ontologyService.getRelationsBetweenClasses(instance.current_ontology, {classes: instance.classes_to_map}).then((res) => {
             let rel = Object.keys(res.data.relations).map((rel: string) => {
                 return instance.relations[rel]
             })

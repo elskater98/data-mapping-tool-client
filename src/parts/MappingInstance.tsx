@@ -52,15 +52,16 @@ const MappingInstance = (props: any) => {
             setMapping(res.data.data.mapping[_class].columns);
             setSubject(res.data.data.mapping[_class].subject);
             setLoading({...loading, instance: false})
+            getOntology(res.data.data.current_ontology)
         }).catch((err) => {
             message.error(err.toString());
             setLoading({...loading, instance: false})
         })
     }
 
-    const getOntology = () => {
+    const getOntology = (id: string) => {
         setLoading({...loading, ontology: true})
-        ontologyService.getProperties("data", {classes: _class}).then((res) => {
+        ontologyService.getProperties(id, "data", {classes: _class}).then((res) => {
             setProperties(res.data.data)
             setLoading({...loading, ontology: false})
         }).catch((err) => {
@@ -97,7 +98,6 @@ const MappingInstance = (props: any) => {
     }
 
     useEffect(() => {
-        getOntology()
         getSample(current_file)
         getInstance()
     }, [])

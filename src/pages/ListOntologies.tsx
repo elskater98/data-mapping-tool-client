@@ -66,10 +66,11 @@ const ListOntologies = () => {
     const edit = () => {
 
         ontologyService.editOntology(currentRecord._id.$oid, editForm.getFieldsValue()).then((res) => {
+            closeEditModal();
         }).catch((err) => {
             message.error(err.toString())
         })
-        closeEditModal();
+
     }
 
     const onChangeDragger = (info: any) => {

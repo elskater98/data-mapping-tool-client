@@ -1,5 +1,20 @@
 import React, {Fragment, useEffect, useState} from "react";
-import {Button, Col, Form, Input, message, Modal, Popconfirm, Progress, Row, Space, Table, Tooltip, Upload} from "antd";
+import {
+    Button,
+    Col,
+    Form,
+    Input,
+    message,
+    Modal,
+    Popconfirm,
+    Progress,
+    Row,
+    Select,
+    Space,
+    Table,
+    Tooltip,
+    Upload
+} from "antd";
 import {
     BuildOutlined,
     DeleteOutlined,
@@ -31,6 +46,7 @@ const MyInstancesPage = () => {
 
     const [data, setData] = useState<any>([]);
     const [dataSource, setDataSource] = useState<any>([]);
+    const [ontologies, setOntologies] = useState<any>([]);
     const [dataSourceLoading, setDataSourceLoading] = useState(false);
     const [searchInput] = useState("");
     const [visible, setVisible] = useState(false);
@@ -45,7 +61,7 @@ const MyInstancesPage = () => {
 
         delete values.upload_file;
         instanceService.createInstances(values).then((res) => {
-            ontologyService.initInstance(res.data.instance.ref).catch(err => message.error(err.toString()));
+            instanceService.initInstance(res.data.instance.ref).catch(err => message.error(err.toString()));
             gatherInstances();
             closeModal();
             message.success("The instances has been created successfully.")
@@ -53,10 +69,18 @@ const MyInstancesPage = () => {
             message.error(err.toString())
         })
     }
+    const gatherOntologies = () => {
+        ontologyService.getOntologies().then((res) => {
+            setOntologies(res.data.data.map((i: any) => {
+                return {label: i.ontology_name, value: i._id.$oid}
+            }))
+        }).catch(err => message.error(err.toString()))
+    }
 
     // Gather Data
     useEffect(() => {
         gatherInstances()
+        gatherOntologies()
     }, [])
 
     const gatherInstances = () => {
@@ -133,12 +157,22 @@ const MyInstancesPage = () => {
                 <Form form={form} layout={"vertical"} onFinish={onFinish}>
                     <Row>
                         <Col span={10}>
-                            <Form.Item name={"name"} label={"Name"} rules={[{required: true}]}>
+                            <Form.Item name={"name"} label={"Name"} rules={[{required: true}]} hasFeedback>
                                 <Input placeholder={"Instance Name"}/>
                             </Form.Item>
+
                             <Form.Item name={"description"} label={"Description"}>
                                 <Input.TextArea showCount maxLength={280}/>
                             </Form.Item>
+
+                            <Form.Item name={"current_ontology"} label={"Ontology"} rules={[{required: true}]}
+                                       hasFeedback>
+                                <Select loading={ontologies.length == 0} options={ontologies}>
+
+
+                                </Select>
+                            </Form.Item>
+
                         </Col>
                         <Col span={2}/>
                         <Col span={10}>

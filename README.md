@@ -5,6 +5,8 @@ develop the user's visual interface to interact with our [API](https://github.co
 Furthermore, the project aims to make the process of mapping data using a single ontology or multiple ones. In our case,
 the the project uses the BIGG ontology as background.
 
+![image](https://user-images.githubusercontent.com/45320338/159911349-a4016560-afd1-43cd-b022-609797a0eea9.png)
+
 ## Getting Started
 
 ### Prerequisite

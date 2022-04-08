@@ -92,7 +92,7 @@ const ListOntologies = () => {
         let id = record._id.$oid;
 
         ontologyService.downloadOntology(id).then((res) => {
-            fileDownload(JSON.stringify(res.data.data), `${id}.owl`)
+            fileDownload(JSON.stringify(res.data.data), `${record.ontology_name}.owl`)
         }).catch(err => message.error(err.toString()))
     }
 

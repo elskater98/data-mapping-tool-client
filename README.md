@@ -24,4 +24,5 @@ To install all the dependencies of the project, you should run the following com
 
 ### File format: .env
     REACT_APP_API_URL=http://localhost:8080
+    REACT_APP_DEFAULT_ONTOLOGY_ID=<str:id>
     WDS_SOCKET_PORT=0

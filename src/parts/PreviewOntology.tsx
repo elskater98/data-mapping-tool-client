@@ -12,8 +12,9 @@ import ReactFlow, {
     removeElements
 } from "react-flow-renderer";
 import {getLayoutedElements} from "../utils/ReactFlowUtils";
+import ConfigService from "../services/ConfigService";
 
-const PreviewOntology = () => {
+const PreviewOntology = (props: any) => {
 
     const ontologyService = new OntologyService();
     const [elements, setElements] = useState<any>([]);
@@ -27,7 +28,7 @@ const PreviewOntology = () => {
         setElements((els: Elements<any>) => removeElements(elementsToRemove, els));
 
     useEffect(() => {
-        ontologyService.getOntologyPreview().then((res) => {
+        ontologyService.getOntologyPreview(props.ontology_id).then((res) => {
             setElements(getLayoutedElements(res.data.classes.concat(res.data.relations), 'TB', 200, 50));
         }).catch(err => message.error(err.toString()))
     }, []);

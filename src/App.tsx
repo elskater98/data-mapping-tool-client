@@ -19,6 +19,7 @@ import PreviewResults from "./parts/PreviewResults";
 import PreviewOntology from "./parts/PreviewOntology";
 import OntologyService from "./services/OntologyService";
 import ListOntologies from "./pages/ListOntologies";
+import ConfigService from "./services/ConfigService";
 
 // Components
 const {Header, Content, Footer} = Layout;
@@ -31,7 +32,7 @@ function App() {
     let navigate = useNavigate();
     const location = useLocation();
 
-    const ontologyService = new OntologyService();
+    const configService = new ConfigService().getConfig()
 
     const [ontologyVersion, setOntologyVersion] = useState<any>("v1");
 
@@ -76,7 +77,8 @@ function App() {
                     <div className="site-layout-background"
                          style={{margin: '25px 0', padding: 24, minHeight: 380, height: "80vh"}}>
                         <Routes>
-                            <Route path={""} element={<PreviewOntology/>}/>
+                            <Route path={""}
+                                   element={<PreviewOntology ontology_id={configService.default_ontology_id}/>}/>
                             <Route path="/" element={<ProtectedRoute
                                 roles={[Roles.User, Roles.Admin]}><HomaPage/></ProtectedRoute>}>
                                 <Route path={"instances/"} element={<ListInstances/>}/>

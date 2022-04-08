@@ -2,7 +2,8 @@ import React, {Fragment, useEffect, useState} from "react";
 import OntologyService from "../services/OntologyService";
 import {Button, Col, Form, Input, message, Modal, Popconfirm, Row, Select, Space, Table, Tooltip, Upload} from "antd";
 import {
-    DeleteOutlined, DownloadOutlined,
+    DeleteOutlined,
+    DownloadOutlined,
     EditOutlined,
     GlobalOutlined,
     InboxOutlined,

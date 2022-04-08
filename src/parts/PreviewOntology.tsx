@@ -14,10 +14,9 @@ import ReactFlow, {
 import {getLayoutedElements} from "../utils/ReactFlowUtils";
 import ConfigService from "../services/ConfigService";
 
-const PreviewOntology = () => {
+const PreviewOntology = (props: any) => {
 
     const ontologyService = new OntologyService();
-    const configService = new ConfigService().getConfig();
     const [elements, setElements] = useState<any>([]);
 
     const onConnect = (params: Edge<any> | Connection) =>
@@ -29,7 +28,7 @@ const PreviewOntology = () => {
         setElements((els: Elements<any>) => removeElements(elementsToRemove, els));
 
     useEffect(() => {
-        ontologyService.getOntologyPreview(configService.default_ontology_id).then((res) => {
+        ontologyService.getOntologyPreview(props.ontology_id).then((res) => {
             setElements(getLayoutedElements(res.data.classes.concat(res.data.relations), 'TB', 200, 50));
         }).catch(err => message.error(err.toString()))
     }, []);

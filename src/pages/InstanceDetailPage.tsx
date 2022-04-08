@@ -312,7 +312,10 @@ const InstanceDetailPage = () => {
     // Add and clean functions
 
     const addAll = () => {
-        classesForm.setFieldsValue({select: classes})
+        let all = classes.map((i: any) => {
+            return i.value
+        })
+        classesForm.setFieldsValue({select: all})
     }
 
     const undo = () => {

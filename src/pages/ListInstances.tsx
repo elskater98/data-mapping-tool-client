@@ -209,7 +209,7 @@ const MyInstancesPage = () => {
                            loading={dataSourceLoading}
                            pagination={{defaultPageSize: 10, showSizeChanger: true, pageSizeOptions: [5, 10]}}
                            bordered={true}
-                           scroll={{x: 1300}}>
+                           scroll={{x: 1300}}>1
                         <Column align={"center"} title="Ref." dataIndex="ref" key="ref"
                                 sortDirections={['descend', 'ascend']}
                                 sorter={{compare: (a: any, b: any) => alphabeticalSort(a.ref, b.ref), multiple: 3}}

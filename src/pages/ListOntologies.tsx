@@ -9,13 +9,14 @@ import {
     InboxOutlined,
     LockOutlined,
     PlusOutlined,
-    QuestionCircleOutlined
+    QuestionCircleOutlined, SearchOutlined
 } from "@ant-design/icons";
 import {useForm} from "antd/lib/form/Form";
 import ConfigService from "../services/ConfigService";
 import AuthService from "../services/AuthService";
 import {Option} from "antd/lib/mentions";
 import fileDownload from "js-file-download";
+import {alphabeticalSort} from "../utils/sorter";
 
 const {Dragger} = Upload;
 const {Column} = Table;
@@ -26,6 +27,7 @@ const ListOntologies = () => {
     const configService = new ConfigService().getConfig();
 
     const [dataSource, setDataSource] = useState<any>([])
+    const [data, setData] = useState<any>([]);
     const [loading, setLoading] = useState<any>({ontologies: false})
     const [currentRecord, setCurrentRecord] = useState<any>(null)
     const [fileAccess, setFileAccess] = useState<any>("")
@@ -39,6 +41,7 @@ const ListOntologies = () => {
         setLoading({...loading, ontologies: true})
 
         ontologyService.getOntologies().then((res) => {
+            setData(res.data.data)
             setDataSource(res.data.data)
             setLoading({...loading, ontologies: false})
         }).catch(err => {
@@ -99,6 +102,10 @@ const ListOntologies = () => {
     useEffect(() => {
         gatherOntologies()
     }, [])
+
+    const handleSearch = (value: string, property: string) => {
+        value === '' ? setDataSource(data) : setDataSource(data.filter((i: any) => i[property].includes(value)))
+    }
 
 
     return (<>
@@ -185,9 +192,34 @@ const ListOntologies = () => {
                        bordered={true}
                        rowKey={record => record._id.$oid}
                        scroll={{x: 1300}}>
-                    <Column align={"center"} title="Ontology Name" dataIndex="ontology_name" key="ontology_name"/>
+                    <Column align={"center"} title="Ontology Name" dataIndex="ontology_name" key="ontology_name"
+                            sorter={{
+                                compare: (a: any, b: any) => alphabeticalSort(a.ontology_name, b.ontology_name),
+                                multiple: 3
+                            }}
+                            filterIcon={() => <SearchOutlined/>}
+                            filterDropdown={() => {
+                                return (
+                                    <div style={{padding: 8}}>
+                                        <Input.Search
+                                            allowClear={true}
+                                            onSearch={ref => handleSearch(ref, "ontology_name")}
+                                            defaultValue={""}
+                                            placeholder={`Search Reference`}
+                                            style={{marginBottom: 8, display: 'block'}}
+                                        />
+                                    </div>
+                                );
+                            }}/>
                     <Column align={"center"} title="Description" dataIndex="description" key="description"/>
                     <Column align={"center"} title="Visibility" dataIndex="visibility" key="visibility"
+                            sortDirections={['descend', 'ascend']}
+                            filters={[{text: "Public", value: "public"}, {text: "Private", value: "private"}]}
+                            onFilter={((value, record) => record.visibility === value)}
+                            sorter={{
+                                compare: (a: any, b: any) => alphabeticalSort(a.visibility, b.visibility),
+                                multiple: 2
+                            }}
                             render={(value, record, index) => {
                                 return value === 'private' ? <LockOutlined/> : <GlobalOutlined/>
 

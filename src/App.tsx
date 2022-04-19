@@ -10,14 +10,13 @@ import ProtectedRoute from "./utils/ProtectedRoute";
 import {Roles} from "./utils/Roles";
 import {Provider} from "react-redux";
 import store from "./store";
-import {NodeIndexOutlined, BranchesOutlined} from "@ant-design/icons";
+import {BranchesOutlined, NodeIndexOutlined} from "@ant-design/icons";
 import ListInstances from "./pages/ListInstances";
 import InstanceDetailPage from "./pages/InstanceDetailPage";
 import MappingInstance from "./parts/MappingInstance";
 import MappingRelationsInstance from "./parts/MappingRelationsInstance";
 import PreviewResults from "./parts/PreviewResults";
 import PreviewOntology from "./parts/PreviewOntology";
-import OntologyService from "./services/OntologyService";
 import ListOntologies from "./pages/ListOntologies";
 import ConfigService from "./services/ConfigService";
 

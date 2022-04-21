@@ -228,6 +228,13 @@ const MyInstancesPage = () => {
                                     );
                                 }}
                         />
+                        <Column align={"center"} title="Ontology" dataIndex="current_ontology" key="current_ontology"
+                                sortDirections={['descend', 'ascend']}
+                                render={(value, record, index) => {
+                                    let aux = ontologies.find((element: any) => element.value == value)
+                                    return <>{aux.label}</>
+                                }}
+                        />
                         <Column align={"center"} title="Name." dataIndex="name" key="name"
                                 sortDirections={['descend', 'ascend']}
                                 sorter={{compare: (a: any, b: any) => alphabeticalSort(a.ref, b.ref), multiple: 3}}

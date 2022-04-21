@@ -54,10 +54,10 @@ function App() {
                                     }} className="logo" src={logo} alt="BeeGroup Logo"/>
                                 </Menu.Item>
 
-                                <Menu.Item key={"/instances"} title={"Instances"} icon={<NodeIndexOutlined/>}
+                                <Menu.Item key={"/instances"} title={"Mapping"} icon={<NodeIndexOutlined/>}
                                            onClick={() => {
                                                navigate('/instances')
-                                           }}>Instances</Menu.Item>
+                                           }}>Mapping</Menu.Item>
 
                                 <Menu.Item key={"/ontologies"} title={"Ontologies"} icon={<BranchesOutlined/>}
                                            onClick={() => {

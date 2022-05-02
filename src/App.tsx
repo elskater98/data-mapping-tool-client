@@ -86,7 +86,8 @@ function App() {
                                 <Route path={"instances/:id/link"} element={<MappingRelationsInstance/>}/>
                                 <Route path={"instances/:id/preview"} element={<PreviewResults/>}/>
                             </Route>
-                            <Route path={"ontologies/"} element={<ListOntologies/>}/>
+                            <Route path={"ontologies/"} element={<ProtectedRoute
+                                roles={[Roles.User, Roles.Admin]}><ListOntologies/></ProtectedRoute>}/>
                             <Route path="*" element={<NoFound/>}/>
                         </Routes>
                     </div>

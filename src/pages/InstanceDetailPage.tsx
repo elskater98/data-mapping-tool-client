@@ -276,10 +276,10 @@ const InstanceDetailPage = () => {
         })
     }
 
-    const selectRelation = (value: any, record: any) => {
+    const selectRelation = (record: any) => {
         let newInstance = instance;
-        newInstance.relations[record.relation].selected = !value
-        setInstance(newInstance)
+        newInstance.relations[record.relation].selected = !record['selected']
+        //setInstance(newInstance)
         instanceService.editInstances(params.id, {relations: newInstance.relations}).catch(err => message.error(err.toString()))
     }
 
@@ -466,7 +466,7 @@ const InstanceDetailPage = () => {
                                 );
                             }}
                     />
-                    <Column title={"Selected"} dataIndex={"selected"} align={"center"}
+                    <Column title={"Selected"} dataIndex={"selected"} align={"center"} key={"selected"}
                             sortDirections={['descend', 'ascend']}
                             filters={[{text: "Selected", value: true}, {text: "Unselected", value: false}]}
                             onFilter={((value, record) => record.selected === value)}
@@ -476,11 +476,11 @@ const InstanceDetailPage = () => {
                                 multiple: 2
                             }}
 
-                            render={((value, record, index) => {
-                                return <Switch checked={value} checkedChildren={<CheckOutlined/>}
-                                               unCheckedChildren={<CloseOutlined/>} onClick={() => {
-                                    selectRelation(value, record)
-                                }}/>
+                            render={((value, record) => {
+                                return <><Switch checked={value} checkedChildren={<CheckOutlined/>}
+                                                 unCheckedChildren={<CloseOutlined/>} onChange={() => {
+                                    selectRelation(record)
+                                }}/></>
                             })
                             }/>
                     <Column title={"Actions"} align={"center"} render={((value, record) => {

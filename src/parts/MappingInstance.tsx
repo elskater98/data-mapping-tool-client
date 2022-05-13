@@ -113,7 +113,7 @@ const MappingInstance = (props: any) => {
 
     return (
         <>
-            <Modal width={"200vh"} title={current_file} visible={sampleVisible} footer={null}
+            <Modal width={"200vh"} title={selectedFile} visible={sampleVisible} footer={null}
                    onCancel={closeSampleModal}>
                 <Table scroll={{x: 500}} size={"small"} loading={loading.sample}
                        pagination={{defaultPageSize: 5, showSizeChanger: true, pageSizeOptions: [5, 10, 15]}}

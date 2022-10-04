@@ -51,7 +51,7 @@ class InstanceService {
         return axios.delete(this.configService.getConfig().api_url + '/instances/' + ref, {headers: headers});
     }
 
-    initInstance(ref: string) {
+    initInstance(ref: any) {
         const headers = {
             'Authorization': 'Bearer ' + this.authService.hasCredentials()
         };

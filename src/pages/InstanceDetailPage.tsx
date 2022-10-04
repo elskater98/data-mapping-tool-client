@@ -125,7 +125,6 @@ const InstanceDetailPage = () => {
     const getOntologyInUse = (ontologyId: string) => {
         ontologyService.getOntology(ontologyId).then((res) => {
             let data = res.data.data;
-            console.log({value: data._id.$oid, label: data.ontology_name})
             setCurrentOntology({value: data._id.$oid, label: data.ontology_name})
         }).catch((err) => {
             message.error(err.toString())

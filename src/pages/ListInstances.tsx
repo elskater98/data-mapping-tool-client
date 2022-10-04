@@ -232,7 +232,7 @@ const MyInstancesPage = () => {
                                 sortDirections={['descend', 'ascend']}
                                 render={(value, record, index) => {
                                     let aux = ontologies.find((element: any) => element.value == value)
-                                    return <>{aux.label}</>
+                                    return <>{aux?.label}</>
                                 }}
                         />
                         <Column align={"center"} title="Name." dataIndex="name" key="name"

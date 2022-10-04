@@ -10,7 +10,7 @@ import ProtectedRoute from "./utils/ProtectedRoute";
 import {Roles} from "./utils/Roles";
 import {Provider} from "react-redux";
 import store from "./store";
-import {BranchesOutlined, NodeIndexOutlined} from "@ant-design/icons";
+import {BranchesOutlined, NodeIndexOutlined, ClearOutlined} from "@ant-design/icons";
 import ListInstances from "./pages/ListInstances";
 import InstanceDetailPage from "./pages/InstanceDetailPage";
 import MappingInstance from "./parts/MappingInstance";
@@ -19,6 +19,7 @@ import PreviewResults from "./parts/PreviewResults";
 import PreviewOntology from "./parts/PreviewOntology";
 import ListOntologies from "./pages/ListOntologies";
 import ConfigService from "./services/ConfigService";
+import CleaningPage from "./pages/CleaningPage";
 
 // Components
 const {Header, Content, Footer} = Layout;
@@ -63,6 +64,11 @@ function App() {
                                            onClick={() => {
                                                navigate('/ontologies')
                                            }}>Ontologies</Menu.Item>
+
+                                <Menu.Item key={"/cleaning-zone"} title={"Cleaning"} icon={<ClearOutlined/>}
+                                           onClick={() => {
+                                               navigate('/cleaning-zone')
+                                           }}>Clean Data</Menu.Item>
                             </Menu>
                         </Col>
                         <Col span={10}>
@@ -88,6 +94,9 @@ function App() {
                             </Route>
                             <Route path={"ontologies/"} element={<ProtectedRoute
                                 roles={[Roles.User, Roles.Admin]}><ListOntologies/></ProtectedRoute>}/>
+
+                            <Route path={"cleaning-zone/"} element={<CleaningPage/>}/>
+
                             <Route path="*" element={<NoFound/>}/>
                         </Routes>
                     </div>

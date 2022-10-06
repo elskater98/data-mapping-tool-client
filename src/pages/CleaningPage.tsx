@@ -36,7 +36,7 @@ const CleaningPage = () => {
                     </Steps>
 
                     <div className={"container"}>
-                        <UploadFile/>
+                        <UploadFile isVisible={currentIndex === 0}/>
                     </div>
                     <Button onClick={nextStep}>Next</Button>
                     <Button onClick={previousStep}>Back</Button>

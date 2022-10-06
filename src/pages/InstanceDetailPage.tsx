@@ -125,7 +125,7 @@ const InstanceDetailPage = () => {
     const getOntologyInUse = (ontologyId: string) => {
         ontologyService.getOntology(ontologyId).then((res) => {
             let data = res.data.data;
-            setCurrentOntology({value: data._id.$oid, label: data.ontology_name})
+            setCurrentOntology({value: data._id, label: data.ontology_name})
         }).catch((err) => {
             message.error(err.toString())
         })
@@ -133,7 +133,7 @@ const InstanceDetailPage = () => {
 
     const getOntologies = () => {
         ontologyService.getOntologies().then(res => setOntologies(res.data.data.map((i: any) => {
-            return {value: i._id.$oid, label: i.ontology_name}
+            return {value: i._id, label: i.ontology_name}
         }))).catch((err) => {
             message.error(err.toString())
         })
@@ -279,7 +279,7 @@ const InstanceDetailPage = () => {
     const startMapping = (_class: string) => {
         navigate('mapping', {
             state: {
-                ref: params.id,
+                _id: params.id,
                 _class: _class,
                 subject: instance.mapping[_class].subject,
                 current_file: instance.mapping[_class].fileSelected,
@@ -293,7 +293,7 @@ const InstanceDetailPage = () => {
     const startLink = (relation: any) => {
         navigate('link', {
             state: {
-                ref: params.id,
+                _id: params.id,
                 relation: relation
             }
         })
@@ -307,7 +307,7 @@ const InstanceDetailPage = () => {
     }
 
     const generate = () => {
-        mappingService.generateYARRML({ref: params.id, classes: generateConfig}).then((res) => {
+        mappingService.generateYARRML({_id: params.id, classes: generateConfig}).then((res) => {
             message.success("The YARRRML file has been generated successfully.")
             fileDownload(res.data.yaml, `${params.id}.yaml`)
         }).catch(err => message.error(err.toString()))
@@ -424,10 +424,21 @@ const InstanceDetailPage = () => {
                 <Form.Item name={"filenames"}>
                     <Dragger
                         style={{marginTop: "2vh"}}
-                        accept={",.csv"}
+                        accept={".csv"}
                         action={configService.api_url + "/files/upload"}
                         headers={{Authorization: "Bearer " + authService.hasCredentials()}}
-                        onChange={onChangeDragger}>
+                        onChange={onChangeDragger}
+                        beforeUpload={file => {
+                            const reader = new FileReader();
+
+                            reader.onload = (e: any) => {
+                                console.log(e.target.result);
+                            };
+                            reader.readAsText(file);
+
+                            // Prevent upload
+                            return false;
+                        }}>
                         <p className="ant-upload-drag-icon">
                             <InboxOutlined/>
                         </p>

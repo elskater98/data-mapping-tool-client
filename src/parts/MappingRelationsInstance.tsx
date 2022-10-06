@@ -13,7 +13,7 @@ const MappingRelationsInstance = () => {
 
     const {state} = useLocation();
     const navigate = useNavigate()
-    const {ref, relation}: any = state;
+    const {_id, relation}: any = state;
 
     const [form] = useForm();
 
@@ -28,7 +28,7 @@ const MappingRelationsInstance = () => {
 
     const getInstance = () => {
         setLoading({...loading, instance: true});
-        instanceService.getInstance(ref).then((res) => {
+        instanceService.getInstance(_id).then((res) => {
             let aux_instance = res.data.data;
             setInstance(aux_instance)
 
@@ -64,7 +64,7 @@ const MappingRelationsInstance = () => {
         let newInstance = instance;
         newInstance.relations[relation.relation].from_rel = form.getFieldValue('from_rel')
         newInstance.relations[relation.relation].to_rel = form.getFieldValue('to_rel')
-        instanceService.editInstances(ref, {relations: newInstance.relations}).catch(err => message.error(err.toString()))
+        instanceService.editInstances(_id, {relations: newInstance.relations}).catch(err => message.error(err.toString()))
         navigate(-1)
     }
 

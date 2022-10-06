@@ -61,7 +61,7 @@ const MyInstancesPage = () => {
 
         delete values.upload_file;
         instanceService.createInstances(values).then((res) => {
-            instanceService.initInstance(res.data.instance.ref).catch(err => message.error(err.toString()));
+            instanceService.initInstance(res.data.instance._id).catch(err => message.error(err.toString()));
             gatherInstances();
             closeModal();
             message.success("The instances has been created successfully.")
@@ -72,7 +72,7 @@ const MyInstancesPage = () => {
     const gatherOntologies = () => {
         ontologyService.getOntologies().then((res) => {
             setOntologies(res.data.data.map((i: any) => {
-                return {label: i.ontology_name, value: i._id.$oid}
+                return {label: i.ontology_name, value: i._id}
             }))
         }).catch(err => message.error(err.toString()))
     }
@@ -87,7 +87,7 @@ const MyInstancesPage = () => {
         setDataSourceLoading(true);
         instanceService.getInstances().then((res) => {
             let _data = res.data["data"].map((i: any, index: number) => {
-                i['key'] = i['ref']
+                i['key'] = i['_id']
                 i['index'] = index
                 return i
             });
@@ -112,22 +112,22 @@ const MyInstancesPage = () => {
     }
 
 
-    const mapping = (ref: string) => {
-        navigate(ref)
+    const mapping = (id: string) => {
+        navigate(id)
     }
 
-    const deleteInstance = (ref: string) => {
-        instanceService.removeIntance(ref).then((res) => {
-            message.success("The " + ref + "has been deleted successfully.")
+    const deleteInstance = (id: string) => {
+        instanceService.removeInstance(id).then((res) => {
+            message.success("The " + id + "has been deleted successfully.")
         }).catch((err) => {
             message.error(err.toString())
         });
-        setDataSource(dataSource.filter((i: any) => i['ref'] != ref))
+        setDataSource(dataSource.filter((i: any) => i['_id'] !== id))
     }
 
-    const downloadInstance = (ref: string) => {
-        instanceService.getInstance(ref).then((res) => {
-            fileDownload(JSON.stringify(res.data.data), `${ref}.json`)
+    const downloadInstance = (id: string) => {
+        instanceService.getInstance(id).then((res) => {
+            fileDownload(JSON.stringify(res.data.data), `${id}.json`)
         })
     }
 
@@ -210,16 +210,16 @@ const MyInstancesPage = () => {
                            pagination={{defaultPageSize: 10, showSizeChanger: true, pageSizeOptions: [5, 10]}}
                            bordered={true}
                            scroll={{x: 1300}}>1
-                        <Column align={"center"} title="Ref." dataIndex="ref" key="ref"
+                        <Column align={"center"} title="ID." dataIndex="_id" key="id"
                                 sortDirections={['descend', 'ascend']}
-                                sorter={{compare: (a: any, b: any) => alphabeticalSort(a.ref, b.ref), multiple: 3}}
+                                sorter={{compare: (a: any, b: any) => alphabeticalSort(a._id, b._id), multiple: 3}}
                                 filterIcon={() => <SearchOutlined/>}
                                 filterDropdown={() => {
                                     return (
                                         <div style={{padding: 8}}>
                                             <Input.Search
                                                 allowClear={true}
-                                                onSearch={ref => handleSearch(ref, "ref")}
+                                                onSearch={id => handleSearch(id, "_id")}
                                                 defaultValue={searchInput}
                                                 placeholder={`Search Reference`}
                                                 style={{marginBottom: 8, display: 'block'}}
@@ -231,13 +231,13 @@ const MyInstancesPage = () => {
                         <Column align={"center"} title="Ontology" dataIndex="current_ontology" key="current_ontology"
                                 sortDirections={['descend', 'ascend']}
                                 render={(value, record, index) => {
-                                    let aux = ontologies.find((element: any) => element.value == value)
+                                    let aux = ontologies.find((element: any) => element.value === value)
                                     return <>{aux?.label}</>
                                 }}
                         />
                         <Column align={"center"} title="Name." dataIndex="name" key="name"
                                 sortDirections={['descend', 'ascend']}
-                                sorter={{compare: (a: any, b: any) => alphabeticalSort(a.ref, b.ref), multiple: 3}}
+                                sorter={{compare: (a: any, b: any) => alphabeticalSort(a._id, b._id), multiple: 3}}
                                 filterIcon={() => <SearchOutlined/>}
                                 filterDropdown={() => {
                                     return (
@@ -246,7 +246,7 @@ const MyInstancesPage = () => {
                                                 allowClear={true}
                                                 onSearch={i => handleSearch(i, 'name')}
                                                 defaultValue={searchInput}
-                                                placeholder={`Search Reference`}
+                                                placeholder={`Search ID`}
                                                 style={{marginBottom: 8, display: 'block'}}
                                             />
                                         </div>
@@ -272,12 +272,12 @@ const MyInstancesPage = () => {
 
                                             <Tooltip title="Mapping">
                                                 <Button shape="circle" icon={<BuildOutlined/>} onClick={() => {
-                                                    mapping(i['ref']);
+                                                    mapping(i['_id']);
                                                 }}/>
                                             </Tooltip>
 
                                             <Popconfirm title="Are you sure？" onConfirm={() => {
-                                                deleteInstance(i['ref'])
+                                                deleteInstance(i['_id'])
                                             }}
                                                         icon={<QuestionCircleOutlined style={{color: 'red'}}/>}>
                                                 <a href="#"><Button shape="circle" icon={<DeleteOutlined/>}/></a>
@@ -285,7 +285,7 @@ const MyInstancesPage = () => {
 
                                             <Tooltip title="Download">
                                                 <Button shape="circle" icon={<DownloadOutlined/>} onClick={() => {
-                                                    downloadInstance(i['ref'])
+                                                    downloadInstance(i['_id'])
                                                 }}/>
                                             </Tooltip>
                                         </Space>

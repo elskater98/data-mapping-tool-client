@@ -14,12 +14,12 @@ class InstanceService {
         return axios.get(this.configService.getConfig().api_url + '/instances/', {headers: headers});
     }
 
-    getInstance(ref: any) {
+    getInstance(id: any) {
         const headers = {
             'Authorization': 'Bearer ' + this.authService.hasCredentials()
         };
 
-        return axios.get(this.configService.getConfig().api_url + '/instances/' + ref, {
+        return axios.get(this.configService.getConfig().api_url + '/instances/' + id, {
             headers: headers
         });
 
@@ -34,29 +34,29 @@ class InstanceService {
 
     }
 
-    editInstances(ref: any, payload: object) {
+    editInstances(id: any, payload: object) {
         const headers = {
             'Authorization': 'Bearer ' + this.authService.hasCredentials()
         };
 
-        return axios.patch(this.configService.getConfig().api_url + '/instances/' + ref, payload, {headers: headers});
+        return axios.patch(this.configService.getConfig().api_url + '/instances/' + id, payload, {headers: headers});
 
     }
 
-    removeIntance(ref: string) {
+    removeInstance(id: string) {
         const headers = {
             'Authorization': 'Bearer ' + this.authService.hasCredentials()
         };
 
-        return axios.delete(this.configService.getConfig().api_url + '/instances/' + ref, {headers: headers});
+        return axios.delete(this.configService.getConfig().api_url + '/instances/' + id, {headers: headers});
     }
 
-    initInstance(ref: any) {
+    initInstance(id: any) {
         const headers = {
             'Authorization': 'Bearer ' + this.authService.hasCredentials()
         };
 
-        return axios.post(this.configService.getConfig().api_url + '/instances/' + ref + '/initialize/schema', {}, {headers: headers})
+        return axios.post(this.configService.getConfig().api_url + '/instances/' + id + '/initialize/schema', {}, {headers: headers})
     }
 
 }

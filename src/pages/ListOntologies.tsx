@@ -69,7 +69,7 @@ const ListOntologies = () => {
 
     const edit = () => {
 
-        ontologyService.editOntology(currentRecord._id.$oid, editForm.getFieldsValue()).then((res) => {
+        ontologyService.editOntology(currentRecord._id, editForm.getFieldsValue()).then((res) => {
             closeEditModal();
         }).catch((err) => {
             message.error(err.toString())
@@ -92,7 +92,7 @@ const ListOntologies = () => {
     }
 
     const downloadOntology = (record: any) => {
-        let id = record._id.$oid;
+        let id = record._id;
 
         ontologyService.downloadOntology(id).then((res) => {
             fileDownload(JSON.stringify(res.data.data), `${record.ontology_name}.owl`)
@@ -190,7 +190,7 @@ const ListOntologies = () => {
                        loading={loading.ontologies}
                        pagination={{defaultPageSize: 10, showSizeChanger: true, pageSizeOptions: [5, 10]}}
                        bordered={true}
-                       rowKey={record => record._id.$oid}
+                       rowKey={record => record._id}
                        scroll={{x: 1300}}>
                     <Column align={"center"} title="Ontology Name" dataIndex="ontology_name" key="ontology_name"
                             sorter={{
@@ -203,7 +203,7 @@ const ListOntologies = () => {
                                     <div style={{padding: 8}}>
                                         <Input.Search
                                             allowClear={true}
-                                            onSearch={ref => handleSearch(ref, "ontology_name")}
+                                            onSearch={id => handleSearch(id, "ontology_name")}
                                             defaultValue={""}
                                             placeholder={`Search Reference`}
                                             style={{marginBottom: 8, display: 'block'}}
@@ -244,7 +244,7 @@ const ListOntologies = () => {
                                         </Tooltip>
 
                                         <Popconfirm title="Are you sure？" onConfirm={() => {
-                                            remove(value._id.$oid)
+                                            remove(value._id)
                                         }}
                                                     icon={<QuestionCircleOutlined style={{color: 'red'}}/>}>
                                             <a href="#"><Button shape="circle" icon={<DeleteOutlined/>}/></a>

@@ -12,7 +12,7 @@ const MappingInstance = (props: any) => {
 
     const {state} = useLocation();
     const navigate = useNavigate()
-    const {ref, _class, files, current_file}: any = state;
+    const {_id, _class, files, current_file}: any = state;
 
     const instanceService = new InstanceService();
     const ontologyService = new OntologyService();
@@ -47,7 +47,7 @@ const MappingInstance = (props: any) => {
 
     const getInstance = () => {
         setLoading({...loading, instance: true})
-        instanceService.getInstance(ref).then((res) => {
+        instanceService.getInstance(_id).then((res) => {
             setInstance(res.data.data);
             setMapping(res.data.data.mapping[_class].columns);
             setSubject(res.data.data.mapping[_class].subject);
@@ -79,7 +79,7 @@ const MappingInstance = (props: any) => {
         newInstance.mapping[_class].columns = mapping
         newInstance.mapping[_class].fileSelected = selectedFile
         newInstance.mapping[_class].subject = subject;
-        instanceService.editInstances(ref, {mapping: newInstance.mapping}).catch((err) => {
+        instanceService.editInstances(_id, {mapping: newInstance.mapping}).catch((err) => {
             message.error(err.toString())
         })
         navigate(-1);

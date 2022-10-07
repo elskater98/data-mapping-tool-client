@@ -51,12 +51,12 @@ class InstanceService {
         return axios.delete(this.configService.getConfig().api_url + '/instances/' + id, {headers: headers});
     }
 
-    initInstance(id: any) {
+    initInstance(id: any, data: {} = {}) {
         const headers = {
             'Authorization': 'Bearer ' + this.authService.hasCredentials()
         };
 
-        return axios.post(this.configService.getConfig().api_url + '/instances/' + id + '/initialize/schema', {}, {headers: headers})
+        return axios.post(this.configService.getConfig().api_url + '/instances/' + id + '/initialize/schema', data, {headers: headers})
     }
 
 }

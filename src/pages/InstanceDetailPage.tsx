@@ -94,6 +94,7 @@ const InstanceDetailPage = () => {
 
     useEffect(() => {
         getInstanceInfo();
+
     }, []);
 
     const getInstanceInfo = () => {
@@ -123,21 +124,18 @@ const InstanceDetailPage = () => {
     }
 
     const getOntologyInUse = (ontologyId: string) => {
-        ontologyService.getOntology(ontologyId).then((res) => {
-            let data = res.data.data;
-            setCurrentOntology({value: data._id, label: data.ontology_name})
+        ontologyService.getOntologies().then(res => {
+            setOntologies(res.data.data.map((i: any) => {
+                if (i._id === ontologyId) {
+                    setCurrentOntology({value: i._id, label: i.ontology_name})
+                }
+                return {value: i._id, label: i.ontology_name}
+            }))
         }).catch((err) => {
             message.error(err.toString())
         })
     }
 
-    const getOntologies = () => {
-        ontologyService.getOntologies().then(res => setOntologies(res.data.data.map((i: any) => {
-            return {value: i._id, label: i.ontology_name}
-        }))).catch((err) => {
-            message.error(err.toString())
-        })
-    }
 
     const getClasses = (id: string) => {
         setLoading({...loading, classes: true})
@@ -200,7 +198,6 @@ const InstanceDetailPage = () => {
     // Edit Instance Modal
 
     const showEditInstance = () => {
-        getOntologies();
         setVisibleEditInstance(true);
     }
 
@@ -387,7 +384,7 @@ const InstanceDetailPage = () => {
                   initialValues={{
                       name: instance.name,
                       description: instance.description,
-                      current_ontology: currentOntology.value
+                      current_ontology: currentOntology?.value
                   }}
                   onFinish={onFinishEditInstance}>
                 <Row>
@@ -399,9 +396,12 @@ const InstanceDetailPage = () => {
                             <Select options={ontologies}
                                     onChange={(value, option: any) => {
                                         getOntologyInUse(value)
-                                        instanceService.initInstance(params.id).then(() => {
+                                        instanceService.initInstance(params.id, {ontology_id: value}).then(() => {
                                             setClassSearch([]);
+                                            getClasses(value);
+
                                             setRelationSearch([]);
+                                            getRelations({...instance, current_ontology: value});
                                         }).catch(err => message.error(err.toString()));
                                     }
                                     }/>
@@ -560,7 +560,7 @@ const InstanceDetailPage = () => {
                     <div style={{marginTop: "1%"}}>
                         <h6><b>Created At:</b> {instance.createdAt}</h6>
                         <h4><Tag color={"green"}
-                                 key={currentOntology.value}>{currentOntology.label}</Tag></h4>
+                                 key={currentOntology?.value}>{currentOntology?.label}</Tag></h4>
                         <Progress percent={instance.status} strokeColor="#52c41a"/>
 
                         <Row justify={"center"} gutter={10} style={{alignItems: "center"}}>

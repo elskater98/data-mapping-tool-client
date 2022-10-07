@@ -11,7 +11,7 @@ import {
     Row,
     Select,
     Space,
-    Table,
+    Table, Tag,
     Tooltip,
     Upload
 } from "antd";
@@ -61,7 +61,8 @@ const MyInstancesPage = () => {
 
         delete values.upload_file;
         instanceService.createInstances(values).then((res) => {
-            instanceService.initInstance(res.data.instance._id).catch(err => message.error(err.toString()));
+            const instance = res.data.instance
+            instanceService.initInstance(instance._id, {ontology_id: instance.current_ontology}).catch(err => message.error(err.toString()));
             gatherInstances();
             closeModal();
             message.success("The instances has been created successfully.")
@@ -232,7 +233,7 @@ const MyInstancesPage = () => {
                                 sortDirections={['descend', 'ascend']}
                                 render={(value, record, index) => {
                                     let aux = ontologies.find((element: any) => element.value === value)
-                                    return <>{aux?.label}</>
+                                    return <Tag color={"green"}>{aux?.label}</Tag>
                                 }}
                         />
                         <Column align={"center"} title="Name." dataIndex="name" key="name"
